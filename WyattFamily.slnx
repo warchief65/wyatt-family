@@ -3,6 +3,9 @@
     <Project Path="backend/WyattFamily.Api/WyattFamily.Api.csproj" />
   </Folder>
   <Folder Name="/frontend/">
-    <Project Path="frontend/WyattFamily.Frontend.esproj" />
+    <Project Path="frontend/WyattFamily.Frontend.esproj">
+      <Build />
+      <Deploy />
+    </Project>
   </Folder>
 </Solution>
