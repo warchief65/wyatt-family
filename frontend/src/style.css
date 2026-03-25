@@ -1,6 +1,6 @@
 /* ── Wyatt Family Global Theme ─────────────────────────────────── */
 
-@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quintessential&display=swap');
 
 /* Design Tokens */
 :root {
@@ -9,24 +9,24 @@
   --color-bg-card:      #1A1A1A;
   --color-bg-input:     #0D0D0D;
 
-  --color-gold:         #C9A84C;
-  --color-gold-soft:    #E8C87A;
-  --color-gold-dark:    #7A6020;
+  --color-gold:         #D4B85C;
+  --color-gold-soft:    #EDD48A;
+  --color-gold-dark:    #A88A38;
   --color-gold-deep:    #2A1F00;
   --color-gold-subtle:  #1E1600;
 
   --color-text:         #F5F5F5;
-  --color-text-muted:   #A0A0A0;
-  --color-text-faint:   #555555;
+  --color-text-muted:   #B0B0B0;
+  --color-text-faint:   #666666;
 
-  --color-border:       #1E1800;
-  --color-border-gold:  #7A6020;
-  --color-border-glow:  #3A2E00;
+  --color-border:       #2A2200;
+  --color-border-gold:  #8A7030;
+  --color-border-glow:  #4A3A00;
 
   --color-private-bg:   #1A0000;
   --color-private-text: #7A4040;
 
-  --font-display: 'UnifrakturMaguntia', 'Times New Roman', serif;
+  --font-display: 'Quintessential', 'Times New Roman', serif;
   --font-ui:      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   --radius-sm:    2px;
@@ -45,8 +45,8 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-ui);
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -68,8 +68,8 @@ a:hover { color: var(--color-gold-soft); }
   gap: 6px;
   padding: 8px 20px;
   font-family: var(--font-ui);
-  font-size: 12px;
-  letter-spacing: 1px;
+  font-size: 14px;
+  letter-spacing: 0.8px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition);
@@ -120,8 +120,8 @@ input, textarea, select {
   border-radius: var(--radius-sm);
   color: var(--color-text);
   font-family: var(--font-ui);
-  font-size: 14px;
-  padding: 9px 14px;
+  font-size: 16px;
+  padding: 11px 14px;
   width: 100%;
   transition: border-color var(--transition);
   outline: none;
@@ -136,10 +136,10 @@ select option { background: var(--color-bg-card); }
 
 label {
   display: block;
-  font-size: 11px;
-  letter-spacing: 1px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
   color: var(--color-gold-dark);
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 .form-group { margin-bottom: 1.25rem; }
@@ -147,8 +147,8 @@ label {
 /* Badges & pills */
 .badge {
   display: inline-block;
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-size: 11px;
+  letter-spacing: 0.8px;
   padding: 2px 8px;
   border-radius: 10px;
   background: var(--color-gold-subtle);

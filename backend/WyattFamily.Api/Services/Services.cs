@@ -109,3 +109,44 @@ public class AzureBlobService : IBlobService
         return Task.FromResult(sas.ToString());
     }
 }
+
+// ── Local Filesystem Blob Storage (Development) ──────────────────
+public class LocalFileBlobService : IBlobService
+{
+    private readonly string _root;
+    private readonly ILogger<LocalFileBlobService> _logger;
+
+    public LocalFileBlobService(IWebHostEnvironment env, ILogger<LocalFileBlobService> logger)
+    {
+        _root = Path.Combine(env.ContentRootPath, "dev-blobs");
+        _logger = logger;
+    }
+
+    public async Task UploadAsync(string key, Stream data, string contentType,
+        bool isPrivate, string container = "PublicContainer")
+    {
+        var path = Path.Combine(_root, key.Replace('/', Path.DirectorySeparatorChar));
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        await using var fs = File.Create(path);
+        await data.CopyToAsync(fs);
+        _logger.LogInformation("Dev blob saved: {Path}", path);
+    }
+
+    public Task DeleteAsync(string key, bool isPrivate)
+    {
+        var path = Path.Combine(_root, key.Replace('/', Path.DirectorySeparatorChar));
+        if (File.Exists(path)) File.Delete(path);
+        return Task.CompletedTask;
+    }
+
+    public string GetUrl(string? key, bool isPrivate)
+    {
+        if (key is null) return "";
+        return $"/dev-blobs/{key}";
+    }
+
+    public Task<string> GetSignedUrlAsync(string key, TimeSpan expiry)
+    {
+        return Task.FromResult($"/dev-blobs/{key}");
+    }
+}

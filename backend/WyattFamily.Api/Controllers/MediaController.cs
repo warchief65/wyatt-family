@@ -59,7 +59,7 @@ public class MediaController : ControllerBase
 
         var items = album.Items.Select(i => new {
             i.Id, i.Title, i.Description, i.DateDisplay, i.Location, i.IsPrivate,
-            i.Type, thumbnailUrl = _blob.GetUrl(i.ThumbnailKey, i.IsPrivate),
+            type = i.Type.ToString().ToLower(), thumbnailUrl = _blob.GetUrl(i.ThumbnailKey, i.IsPrivate),
             url = _blob.GetUrl(i.StorageKey, i.IsPrivate),
             People = _db.ContentTags
                 .Where(ct => ct.ContentType == "media" && ct.ContentId == i.Id)
@@ -85,7 +85,8 @@ public class MediaController : ControllerBase
             .OrderByDescending(i => i.CreatedAt)
             .Take(limit)
             .Select(i => new {
-                i.Id, i.Title, i.DateDisplay, i.Location, i.IsPrivate, i.Type,
+                i.Id, i.Title, i.DateDisplay, i.Location, i.IsPrivate,
+                type = i.Type.ToString().ToLower(),
                 thumbnailUrl = i.ThumbnailKey != null ? _blob.GetUrl(i.ThumbnailKey, i.IsPrivate) : null,
                 People = _db.ContentTags
                     .Where(ct => ct.ContentType == "media" && ct.ContentId == i.Id)
@@ -150,6 +151,46 @@ public class MediaController : ControllerBase
         var item = await _db.MediaItems.FindAsync(id);
         if (item is null) return NotFound();
         item.IsPrivate = req.IsPrivate;
+        await _db.SaveChangesAsync();
+        return Ok();
+    }
+
+    // DELETE /api/media/:id  (admin only — single media item)
+    [Authorize(Roles = "admin")]
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteMediaItem(int id)
+    {
+        var item = await _db.MediaItems.FindAsync(id);
+        if (item is null) return NotFound();
+
+        await _blob.DeleteAsync(item.StorageKey, item.IsPrivate);
+        if (item.ThumbnailKey != null)
+            await _blob.DeleteAsync(item.ThumbnailKey, item.IsPrivate);
+
+        _db.MediaItems.Remove(item);
+        await _db.SaveChangesAsync();
+        return Ok();
+    }
+
+    // DELETE /api/media/albums/:id  (admin only — album + all items + blobs)
+    [Authorize(Roles = "admin")]
+    [HttpDelete("albums/{id:int}")]
+    public async Task<IActionResult> DeleteAlbum(int id)
+    {
+        var album = await _db.Albums
+            .Include(a => a.Items)
+            .FirstOrDefaultAsync(a => a.Id == id);
+        if (album is null) return NotFound();
+
+        foreach (var item in album.Items)
+        {
+            await _blob.DeleteAsync(item.StorageKey, item.IsPrivate);
+            if (item.ThumbnailKey != null)
+                await _blob.DeleteAsync(item.ThumbnailKey, item.IsPrivate);
+        }
+
+        _db.MediaItems.RemoveRange(album.Items);
+        _db.Albums.Remove(album);
         await _db.SaveChangesAsync();
         return Ok();
     }

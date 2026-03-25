@@ -17,11 +17,12 @@ public class AdminController : ControllerBase
     private readonly UserManager<AppUser> _users;
     private readonly IEmailService        _email;
     private readonly IConfiguration       _config;
+    private readonly IBlobService          _blobs;
 
     public AdminController(AppDbContext db, UserManager<AppUser> users,
-        IEmailService email, IConfiguration config)
+        IEmailService email, IConfiguration config, IBlobService blobs)
     {
-        _db = db; _users = users; _email = email; _config = config;
+        _db = db; _users = users; _email = email; _config = config; _blobs = blobs;
     }
 
     // Dashboard stats
@@ -152,22 +153,119 @@ public class AdminController : ControllerBase
         }
 
         var subs = await query.OrderByDescending(s => s.SubmittedAt).ToListAsync();
+        var projected = subs.Select(s => new {
+            s.Id,
+            status          = s.Status.ToString().ToLower(),
+            contentType     = s.ContentType,
+            submittedAt     = s.SubmittedAt,
+            title           = s.Title,
+            submittedBy     = $"{s.SubmittedBy.FirstName} {s.SubmittedBy.LastName}".Trim(),
+            description     = s.Description,
+            date            = s.DateDisplay,
+            location        = s.Location,
+            people          = s.People,
+            tags            = s.Tags,
+            source          = s.Source,
+            rejectionReason = s.RejectionReason,
+            files           = s.Files.Select(f => new {
+                url     = _blobs.GetUrl(f.StorageKey, false),
+                isImage = f.ContentType.StartsWith("image/"),
+                name    = f.FileName,
+            }),
+        });
         var counts = new {
             pending  = await _db.Submissions.CountAsync(s => s.Status == SubmissionStatus.Pending),
             approved = await _db.Submissions.CountAsync(s => s.Status == SubmissionStatus.Approved),
             rejected = await _db.Submissions.CountAsync(s => s.Status == SubmissionStatus.Rejected),
             all      = await _db.Submissions.CountAsync(),
         };
-        return Ok(new { submissions = subs, counts });
+        return Ok(new { submissions = projected, counts });
     }
 
     [HttpPost("submissions/{id:int}/approve")]
     public async Task<IActionResult> ApproveSubmission(int id)
     {
-        var sub = await _db.Submissions.Include(s => s.SubmittedBy).FirstOrDefaultAsync(s => s.Id == id);
+        var sub = await _db.Submissions
+            .Include(s => s.SubmittedBy)
+            .Include(s => s.Files)
+            .FirstOrDefaultAsync(s => s.Id == id);
         if (sub is null) return NotFound();
+
         sub.Status     = SubmissionStatus.Approved;
         sub.ReviewedAt = DateTime.UtcNow;
+
+        // Publish content based on submission type
+        switch (sub.ContentType.ToLower())
+        {
+            case "photo":
+            case "video":
+            {
+                var firstImage = sub.Files.FirstOrDefault(f => f.ContentType.StartsWith("image/"));
+                var album = new Album
+                {
+                    Title       = sub.Title,
+                    Description = sub.Description,
+                    DateDisplay = sub.DateDisplay,
+                    Location    = sub.Location,
+                    CoverUrl    = firstImage != null ? _blobs.GetUrl(firstImage.StorageKey, false) : null,
+                };
+                _db.Albums.Add(album);
+                await _db.SaveChangesAsync();
+
+                foreach (var file in sub.Files)
+                {
+                    var isVideo = file.ContentType.StartsWith("video/");
+                    _db.MediaItems.Add(new MediaItem
+                    {
+                        AlbumId       = album.Id,
+                        Type          = isVideo ? MediaType.Video : MediaType.Photo,
+                        Title         = sub.Title,
+                        Description   = sub.Description,
+                        StorageKey    = file.StorageKey,
+                        ThumbnailKey  = file.ContentType.StartsWith("image/") ? file.StorageKey : null,
+                        DateDisplay   = sub.DateDisplay,
+                        Location      = sub.Location,
+                        Source        = sub.Source,
+                        FileSizeBytes = file.FileSizeBytes,
+                    });
+                }
+                await _db.SaveChangesAsync();
+                break;
+            }
+            case "document":
+            {
+                foreach (var file in sub.Files)
+                {
+                    _db.Documents.Add(new Document
+                    {
+                        Title       = sub.Title,
+                        Description = sub.Description,
+                        StorageKey  = file.StorageKey,
+                        DateDisplay = sub.DateDisplay,
+                        Location    = sub.Location,
+                        Source      = sub.Source,
+                        DocType     = DocumentType.Other,
+                    });
+                }
+                await _db.SaveChangesAsync();
+                break;
+            }
+            case "story":
+            {
+                _db.Stories.Add(new Story
+                {
+                    Title       = sub.Title,
+                    Body        = sub.Description ?? "",
+                    Excerpt     = sub.Description?.Length > 200
+                        ? sub.Description[..200] + "..."
+                        : sub.Description,
+                    DateDisplay = sub.DateDisplay,
+                });
+                await _db.SaveChangesAsync();
+                break;
+            }
+        }
+
         await _db.SaveChangesAsync();
         await _email.SendAsync(sub.SubmittedBy.Email!, $"Your submission \"{sub.Title}\" was approved",
             $"<p>Hi {sub.SubmittedBy.FirstName}, your submission has been approved and published to the archive!</p>");
@@ -189,6 +287,33 @@ public class AdminController : ControllerBase
         return Ok();
     }
 
+    // ── Media Items (all, flat list) ──────────────────────────────
+    [HttpGet("media-items")]
+    public async Task<IActionResult> GetAllMediaItems()
+    {
+        var items = await _db.MediaItems
+            .Include(i => i.Album)
+            .OrderByDescending(i => i.CreatedAt)
+            .ToListAsync();
+
+        var projected = items.Select(i => new {
+            i.Id,
+            i.Title,
+            type         = i.Type.ToString().ToLower(),
+            albumId      = i.AlbumId,
+            albumTitle   = i.Album?.Title,
+            thumbnailUrl = _blobs.GetUrl(i.ThumbnailKey, i.IsPrivate),
+            url          = _blobs.GetUrl(i.StorageKey, i.IsPrivate),
+            i.IsPrivate,
+            i.DateDisplay,
+            i.Location,
+            i.CreatedAt,
+            i.FileSizeBytes,
+        });
+
+        return Ok(projected);
+    }
+
     // ── Donations ─────────────────────────────────────────────────
     [HttpGet("donations")]
     public async Task<IActionResult> GetDonations()
@@ -200,6 +325,115 @@ public class AdminController : ControllerBase
         var total = await _db.Donations.SumAsync(d => (decimal?)d.Amount) ?? 0m;
         return Ok(new { donations, total, count = donations.Count });
     }
+
+    // ── Bulk Upload ───────────────────────────────────────────────
+    [HttpPost("bulk-upload")]
+    [RequestSizeLimit(2_000_000_000)] // 2 GB
+    public async Task<IActionResult> BulkUpload([FromForm] BulkUploadRequest req)
+    {
+        if (req.Files is null || req.Files.Count == 0)
+            return BadRequest(new { message = "No files provided." });
+
+        var results = new List<object>();
+
+        switch (req.ContentType.ToLower())
+        {
+            case "photo":
+            case "video":
+            {
+                Album album;
+                if (req.AlbumId.HasValue)
+                {
+                    var existing = await _db.Albums.FindAsync(req.AlbumId.Value);
+                    if (existing is null) return BadRequest(new { message = "Album not found." });
+                    album = existing;
+                }
+                else
+                {
+                    album = new Album
+                    {
+                        Title       = req.Title,
+                        Description = req.Description,
+                        DateDisplay = req.Date,
+                        Location    = req.Location,
+                    };
+                    _db.Albums.Add(album);
+                    await _db.SaveChangesAsync();
+                }
+
+                string? coverUrl = null;
+                foreach (var file in req.Files)
+                {
+                    var isVideo = file.ContentType.StartsWith("video/");
+                    var key     = $"albums/{album.Id}/{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+                    await using var stream = file.OpenReadStream();
+                    await _blobs.UploadAsync(key, stream, file.ContentType, isPrivate: false);
+
+                    if (coverUrl == null && file.ContentType.StartsWith("image/"))
+                        coverUrl = _blobs.GetUrl(key, false);
+
+                    _db.MediaItems.Add(new MediaItem
+                    {
+                        AlbumId       = album.Id,
+                        Type          = isVideo ? MediaType.Video : MediaType.Photo,
+                        Title         = Path.GetFileNameWithoutExtension(file.FileName),
+                        Description   = req.Description,
+                        StorageKey    = key,
+                        ThumbnailKey  = file.ContentType.StartsWith("image/") ? key : null,
+                        DateDisplay   = req.Date,
+                        Location      = req.Location,
+                        Source        = req.Source,
+                        FileSizeBytes = file.Length,
+                    });
+                    results.Add(new { fileName = file.FileName, status = "uploaded" });
+                }
+                album.CoverUrl = coverUrl;
+                await _db.SaveChangesAsync();
+                break;
+            }
+            case "document":
+            {
+                foreach (var file in req.Files)
+                {
+                    var key = $"documents/{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                    await using var stream = file.OpenReadStream();
+                    await _blobs.UploadAsync(key, stream, file.ContentType, isPrivate: false);
+
+                    _db.Documents.Add(new Document
+                    {
+                        Title       = !string.IsNullOrEmpty(req.Title)
+                            ? req.Title
+                            : Path.GetFileNameWithoutExtension(file.FileName),
+                        Description = req.Description,
+                        StorageKey  = key,
+                        DateDisplay = req.Date,
+                        Location    = req.Location,
+                        Source      = req.Source,
+                        DocType     = DocumentType.Other,
+                    });
+                    results.Add(new { fileName = file.FileName, status = "uploaded" });
+                }
+                await _db.SaveChangesAsync();
+                break;
+            }
+            default:
+                return BadRequest(new { message = $"Unsupported content type '{req.ContentType}'." });
+        }
+
+        return Ok(new { uploaded = results.Count, items = results });
+    }
 }
 
 public record RejectRequest(string? Reason);
+
+public record BulkUploadRequest(
+    [FromForm] string ContentType,
+    [FromForm] string Title,
+    [FromForm] string? Description,
+    [FromForm] string? Date,
+    [FromForm] string? Location,
+    [FromForm] string? Source,
+    [FromForm] string? Tags,
+    [FromForm] int? AlbumId,
+    [FromForm] IFormFileCollection? Files);

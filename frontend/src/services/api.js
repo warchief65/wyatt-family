@@ -6,6 +6,15 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' }
 })
 
+// Attach JWT to every request
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('wf_token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
 // Intercept 401s — redirect to login
 api.interceptors.response.use(
   res => res,

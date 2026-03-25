@@ -53,7 +53,16 @@ builder.Services.AddAuthorization();
 
 // ── Application Services ──────────────────────────────────────────
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
-builder.Services.AddScoped<IBlobService,  AzureBlobService>();
+
+if (builder.Environment.IsDevelopment() &&
+    builder.Configuration["Azure:BlobStorage:ConnectionString"] == "UseDevelopmentStorage=true")
+{
+    builder.Services.AddScoped<IBlobService, LocalFileBlobService>();
+}
+else
+{
+    builder.Services.AddScoped<IBlobService, AzureBlobService>();
+}
 
 // ── CORS ──────────────────────────────────────────────────────────
 var frontendUrl = builder.Configuration["Frontend:BaseUrl"] ?? "http://localhost:5173";
@@ -69,6 +78,17 @@ builder.Services.AddCors(options =>
 // ── Controllers & Swagger ─────────────────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// Allow large file uploads (2 GB) for bulk-upload endpoint
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 2_000_000_000;
+});
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 2_000_000_000;
+});
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Wyatt Family API", Version = "v1" });
@@ -97,10 +117,23 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    // Serve uploaded dev blobs as static files
+    var devBlobPath = Path.Combine(app.Environment.ContentRootPath, "dev-blobs");
+    Directory.CreateDirectory(devBlobPath);
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(devBlobPath),
+        RequestPath  = "/dev-blobs"
+    });
 }
 
-app.UseHttpsRedirection();
 app.UseCors();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -111,6 +144,60 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
     await DbSeeder.SeedAsync(scope.ServiceProvider);
+}
+
+// ── Start Vite dev server & open browser in Development ───────────
+if (app.Environment.IsDevelopment())
+{
+    var frontendDir = Path.GetFullPath(
+        Path.Combine(app.Environment.ContentRootPath, "..", "..", "frontend"));
+
+    if (Directory.Exists(frontendDir))
+    {
+        var npm = OperatingSystem.IsWindows() ? "npm.cmd" : "npm";
+        var vite = new System.Diagnostics.Process
+        {
+            StartInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName         = npm,
+                Arguments        = "run dev",
+                WorkingDirectory = frontendDir,
+                UseShellExecute  = true,
+                WindowStyle      = System.Diagnostics.ProcessWindowStyle.Minimized,
+            }
+        };
+        vite.Start();
+
+        // Poll until Vite is accepting connections, then open the browser
+        _ = Task.Run(async () =>
+        {
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
+            for (var i = 0; i < 30; i++) // up to ~30 seconds
+            {
+                await Task.Delay(1000);
+                try
+                {
+                    var res = await http.GetAsync("http://localhost:5173");
+                    if (res.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName        = "http://localhost:5173",
+                            UseShellExecute = true
+                        });
+                        break;
+                    }
+                }
+                catch { /* Vite not ready yet */ }
+            }
+        });
+
+        // Kill Vite when the API shuts down
+        app.Lifetime.ApplicationStopping.Register(() =>
+        {
+            if (!vite.HasExited) { vite.Kill(entireProcessTree: true); }
+        });
+    }
 }
 
 app.Run();

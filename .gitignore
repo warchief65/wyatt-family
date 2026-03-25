@@ -11,6 +11,7 @@ backend/**/obj/
 backend/**/*.user
 backend/**/appsettings.Development.json
 backend/**/publish/
+backend/**/dev-blobs/
 *.suo
 .vs/
 

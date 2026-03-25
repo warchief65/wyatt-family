@@ -15,11 +15,6 @@
 <script setup>
 import AppNav from '@/components/layout/AppNav.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
-import { useAuthStore } from '@/stores/auth'
-import { onMounted } from 'vue'
-
-const auth = useAuthStore()
-onMounted(() => auth.restoreSession())
 </script>
 
 <style scoped>

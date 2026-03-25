@@ -2,7 +2,15 @@
   <div class="home">
     <!-- Hero -->
     <section class="hero">
-      <img src="/crest.png" alt="Wyatt Coat of Arms" class="hero-crest" />
+      <div class="crest-wrapper">
+        <img src="/crest.png" alt="Wyatt Coat of Arms" class="hero-crest" />
+        <span class="sparkle s1"></span>
+        <span class="sparkle s2"></span>
+        <span class="sparkle s3"></span>
+        <span class="sparkle s4"></span>
+        <span class="sparkle s5"></span>
+        <span class="sparkle s6"></span>
+      </div>
       <h1 class="hero-title display-font">Wyatt Family</h1>
       <hr class="gold-rule hero-rule" />
       <p class="hero-tagline">Preserving Our History &nbsp;·&nbsp; Sharing Our Stories &nbsp;·&nbsp; alanwyatt.com</p>
@@ -140,12 +148,43 @@ onMounted(async () => {
   text-align: center;
   border-bottom: 1px solid var(--color-border-gold);
 }
+.crest-wrapper {
+  position: relative;
+  display: inline-block;
+}
 .hero-crest {
-  width: 110px;
-  height: 110px;
+  width: 260px;
+  height: 260px;
   object-fit: contain;
-  filter: drop-shadow(0 0 14px rgba(201,168,76,0.35));
-  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 22px rgba(201,168,76,0.45));
+  margin-bottom: 1.5rem;
+}
+
+/* Sparkle particles */
+.sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, rgba(201,168,76,0.9) 40%, transparent 70%);
+  box-shadow: 0 0 6px 2px rgba(201,168,76,0.6);
+  opacity: 0;
+  pointer-events: none;
+  animation: sparkle-pop 2.4s ease-in-out infinite;
+}
+.s1 { top: 10%;  left: 8%;   animation-delay: 0s; }
+.s2 { top: 5%;   right: 12%; animation-delay: 0.4s; }
+.s3 { top: 45%;  left: -4%;  animation-delay: 0.8s; width: 5px; height: 5px; }
+.s4 { top: 40%;  right: -2%; animation-delay: 1.2s; }
+.s5 { bottom: 18%; left: 5%; animation-delay: 1.6s; width: 4px; height: 4px; }
+.s6 { bottom: 22%; right: 8%; animation-delay: 2.0s; width: 5px; height: 5px; }
+
+@keyframes sparkle-pop {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  15%      { opacity: 1; transform: scale(1.2) rotate(30deg); }
+  30%      { opacity: 1; transform: scale(1) rotate(60deg); }
+  50%      { opacity: 0.6; transform: scale(0.8) rotate(120deg); }
+  70%      { opacity: 0; transform: scale(0) rotate(180deg); }
 }
 .hero-title {
   font-size: 52px;
@@ -240,6 +279,6 @@ onMounted(async () => {
 @media (max-width: 768px) {
   .hero-title { font-size: 36px; }
   .two-col { grid-template-columns: 1fr; }
-  .hero-crest { width: 80px; height: 80px; }
+  .hero-crest { width: 140px; height: 140px; }
 }
 </style>

@@ -23,15 +23,20 @@ export const useAuthStore = defineStore('auth', () => {
     // Account created but pending — do not log in yet
   }
 
+  let _ready = null
   async function restoreSession() {
-    if (!token.value) return
-    try {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
-      const { data } = await api.get('/auth/me')
-      user.value = data
-    } catch {
-      logout()
-    }
+    if (_ready) return _ready
+    _ready = (async () => {
+      if (!token.value) return
+      try {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
+        const { data } = await api.get('/auth/me')
+        user.value = data
+      } catch {
+        logout()
+      }
+    })()
+    return _ready
   }
 
   function logout() {

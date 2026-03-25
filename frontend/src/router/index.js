@@ -42,6 +42,7 @@ const routes = [
       { path: 'content',     name: 'admin-content',     component: () => import('@/views/admin/AdminContent.vue') },
       { path: 'comments',    name: 'admin-comments',    component: () => import('@/views/admin/AdminComments.vue') },
       { path: 'donations',   name: 'admin-donations',   component: () => import('@/views/admin/AdminDonations.vue') },
+      { path: 'bulk-upload', name: 'admin-bulk-upload', component: () => import('@/views/admin/AdminBulkUpload.vue') },
     ]
   },
 
@@ -55,16 +56,16 @@ const router = createRouter({
 })
 
 // Navigation guards
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to) => {
   const auth = useAuthStore()
+  await auth.restoreSession()
 
   if (to.meta.requiresAdmin && !auth.isAdmin) {
-    return next({ name: 'login', query: { redirect: to.fullPath } })
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
   if (to.meta.requiresAuth && !auth.isApproved) {
-    return next({ name: 'login', query: { redirect: to.fullPath } })
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
-  next()
 })
 
 export default router

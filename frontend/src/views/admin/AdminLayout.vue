@@ -12,6 +12,7 @@
         <RouterLink to="/admin/content"     active-class="active">Content</RouterLink>
         <RouterLink to="/admin/comments"    active-class="active">Comments</RouterLink>
         <RouterLink to="/admin/donations"   active-class="active">Donations</RouterLink>
+        <RouterLink to="/admin/bulk-upload" active-class="active">Bulk Upload</RouterLink>
         <hr />
         <RouterLink to="/">← View Site</RouterLink>
       </nav>

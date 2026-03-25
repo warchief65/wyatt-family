@@ -70,8 +70,8 @@ public class AuthController : ControllerBase
 
         return Ok(new
         {
-            token = GenerateToken(user),
-            user  = MapUser(user)
+            token = await GenerateTokenAsync(user),
+            user  = await MapUserAsync(user)
         });
     }
 
@@ -81,7 +81,7 @@ public class AuthController : ControllerBase
     {
         var user = await _users.GetUserAsync(User);
         if (user is null) return Unauthorized();
-        return Ok(MapUser(user));
+        return Ok(await MapUserAsync(user));
     }
 
     [HttpPost("forgot-password")]
@@ -112,13 +112,13 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Password reset successfully." });
     }
 
-    private string GenerateToken(AppUser user)
+    private async Task<string> GenerateTokenAsync(AppUser user)
     {
         var key     = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]!));
         var creds   = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var expires = DateTime.UtcNow.AddDays(double.Parse(_config["Jwt:ExpiryDays"] ?? "7"));
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub,   user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.Email!),
@@ -126,6 +126,10 @@ public class AuthController : ControllerBase
             new Claim("lastName",  user.LastName),
             new Claim("status",    user.Status.ToString()),
         };
+
+        var roles = await _users.GetRolesAsync(user);
+        foreach (var role in roles)
+            claims.Add(new Claim(ClaimTypes.Role, role));
 
         var token = new JwtSecurityToken(
             issuer:   _config["Jwt:Issuer"],
@@ -137,10 +141,14 @@ public class AuthController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private static object MapUser(AppUser u) => new
+    private async Task<object> MapUserAsync(AppUser u)
     {
-        u.Id, u.Email, u.FirstName, u.LastName,
-        status = u.Status.ToString().ToLower(),
-        role   = "member" // enriched from role claims in full impl
-    };
+        var roles = await _users.GetRolesAsync(u);
+        return new
+        {
+            u.Id, u.Email, u.FirstName, u.LastName,
+            status = u.Status.ToString().ToLower(),
+            role   = roles.Contains("admin") ? "admin" : "member"
+        };
+    }
 }
