@@ -1,27 +1,65 @@
 <template>
-  <div class="album-page" v-if="album">
+  <div
+    v-if="album"
+    class="album-page"
+  >
     <div class="page-header">
-      <RouterLink to="/photos" class="back-link text-muted">← Albums</RouterLink>
-      <h1 class="display-font page-title">{{ album.title }}</h1>
-      <p class="text-muted album-meta">{{ album.dateDisplay }} <span v-if="album.location">· {{ album.location }}</span></p>
-      <p v-if="album.description" class="album-desc text-muted">{{ album.description }}</p>
-      <div v-if="album.people?.length" class="album-tags">
-        <span v-for="p in album.people" :key="p" class="badge">{{ p }}</span>
+      <RouterLink
+        to="/photos"
+        class="back-link text-muted"
+      >
+        ← Albums
+      </RouterLink>
+      <h1 class="display-font page-title">
+        {{ album.title }}
+      </h1>
+      <p class="text-muted album-meta">
+        {{ album.dateDisplay }} <span v-if="album.location">· {{ album.location }}</span>
+      </p>
+      <p
+        v-if="album.description"
+        class="album-desc text-muted"
+      >
+        {{ album.description }}
+      </p>
+      <div
+        v-if="album.people?.length"
+        class="album-tags"
+      >
+        <span
+          v-for="p in album.people"
+          :key="p"
+          class="badge"
+        >{{ p }}</span>
       </div>
-      <hr class="gold-rule" />
+      <hr class="gold-rule">
     </div>
 
     <div class="album-content">
       <PhotoGrid :items="album.items" />
 
       <!-- Comments -->
-      <CommentSection v-if="auth.isLoggedIn" :artifact-id="album.id" artifact-type="album" />
-      <div v-else class="comment-gate text-muted">
-        <RouterLink to="/login">Sign in</RouterLink> to view and post comments.
+      <CommentSection
+        v-if="auth.isLoggedIn"
+        :artifact-id="album.id"
+        artifact-type="album"
+      />
+      <div
+        v-else
+        class="comment-gate text-muted"
+      >
+        <RouterLink to="/login">
+          Sign in
+        </RouterLink> to view and post comments.
       </div>
     </div>
   </div>
-  <div v-else-if="loading" class="loading text-muted">Loading album...</div>
+  <div
+    v-else-if="loading"
+    class="loading text-muted"
+  >
+    Loading album...
+  </div>
 </template>
 
 <script setup>

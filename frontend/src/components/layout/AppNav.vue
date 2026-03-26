@@ -1,53 +1,157 @@
 <template>
   <nav class="app-nav">
     <div class="nav-brand">
-      <RouterLink to="/" class="brand-link">
-        <img src="/crest.png" alt="Wyatt Crest" class="nav-crest" />
+      <RouterLink
+        to="/"
+        class="brand-link"
+      >
+        <img
+          src="/crest.png"
+          alt="Wyatt Crest"
+          class="nav-crest"
+        >
         <span class="brand-name display-font">Wyatt</span>
       </RouterLink>
     </div>
-      <!-- TODO: Menu Tabs not centered on crest  -->
+    <!-- TODO: Menu Tabs not centered on crest  -->
     <ul class="nav-links">
-      <li><RouterLink to="/photos">Photos &amp; Videos</RouterLink></li>
-      <li><RouterLink to="/tree">Family Tree</RouterLink></li>
-      <li><RouterLink to="/documents">Documents</RouterLink></li>
-      <li><RouterLink to="/stories">Stories</RouterLink></li>
+      <li>
+        <RouterLink to="/photos">
+          Photos &amp; Videos
+        </RouterLink>
+      </li>
+      <li>
+        <RouterLink to="/tree">
+          Family Tree
+        </RouterLink>
+      </li>
+      <li>
+        <RouterLink to="/documents">
+          Documents
+        </RouterLink>
+      </li>
+      <li>
+        <RouterLink to="/stories">
+          Stories
+        </RouterLink>
+      </li>
     </ul>
 
     <div class="nav-right">
       <template v-if="auth.isLoggedIn">
-        <RouterLink v-if="auth.isAdmin" to="/admin" class="btn btn-ghost btn-sm">Admin</RouterLink>
-        <RouterLink to="/submit" class="btn btn-ghost btn-sm">Submit</RouterLink>
-        <button class="btn btn-secondary btn-sm" @click="handleLogout">Sign Out</button>
+        <RouterLink
+          v-if="auth.isAdmin"
+          to="/admin"
+          class="btn btn-ghost btn-sm"
+        >
+          Admin
+        </RouterLink>
+        <RouterLink
+          to="/submit"
+          class="btn btn-ghost btn-sm"
+        >
+          Submit
+        </RouterLink>
+        <button
+          class="btn btn-secondary btn-sm"
+          @click="handleLogout"
+        >
+          Sign Out
+        </button>
       </template>
       <template v-else>
-        <RouterLink to="/login"    class="btn btn-secondary btn-sm">Sign In</RouterLink>
-        <RouterLink to="/register" class="btn btn-primary btn-sm">Join</RouterLink>
+        <RouterLink
+          to="/login"
+          class="btn btn-secondary btn-sm"
+        >
+          Sign In
+        </RouterLink>
+        <RouterLink
+          to="/register"
+          class="btn btn-primary btn-sm"
+        >
+          Join
+        </RouterLink>
       </template>
 
       <!-- Mobile hamburger -->
-      <button class="hamburger" @click="menuOpen = !menuOpen" aria-label="Menu">
-        <span></span><span></span><span></span>
+      <button
+        class="hamburger"
+        aria-label="Menu"
+        @click="menuOpen = !menuOpen"
+      >
+        <span /><span /><span />
       </button>
     </div>
 
     <!-- Mobile menu -->
     <Transition name="fade">
-      <div v-if="menuOpen" class="mobile-menu">
-        <RouterLink to="/photos"    @click="menuOpen = false">Photos &amp; Videos</RouterLink>
-        <RouterLink to="/tree"      @click="menuOpen = false">Family Tree</RouterLink>
-        <RouterLink to="/documents" @click="menuOpen = false">Documents</RouterLink>
-        <RouterLink to="/stories"   @click="menuOpen = false">Stories</RouterLink>
-        <hr />
+      <div
+        v-if="menuOpen"
+        class="mobile-menu"
+      >
+        <RouterLink
+          to="/photos"
+          @click="menuOpen = false"
+        >
+          Photos &amp; Videos
+        </RouterLink>
+        <RouterLink
+          to="/tree"
+          @click="menuOpen = false"
+        >
+          Family Tree
+        </RouterLink>
+        <RouterLink
+          to="/documents"
+          @click="menuOpen = false"
+        >
+          Documents
+        </RouterLink>
+        <RouterLink
+          to="/stories"
+          @click="menuOpen = false"
+        >
+          Stories
+        </RouterLink>
+        <hr>
         <template v-if="auth.isLoggedIn">
-          <RouterLink to="/submit"  @click="menuOpen = false">Submit Content</RouterLink>
-          <RouterLink to="/profile" @click="menuOpen = false">My Profile</RouterLink>
-          <RouterLink v-if="auth.isAdmin" to="/admin" @click="menuOpen = false">Admin Panel</RouterLink>
-          <button @click="handleLogout">Sign Out</button>
+          <RouterLink
+            to="/submit"
+            @click="menuOpen = false"
+          >
+            Submit Content
+          </RouterLink>
+          <RouterLink
+            to="/profile"
+            @click="menuOpen = false"
+          >
+            My Profile
+          </RouterLink>
+          <RouterLink
+            v-if="auth.isAdmin"
+            to="/admin"
+            @click="menuOpen = false"
+          >
+            Admin Panel
+          </RouterLink>
+          <button @click="handleLogout">
+            Sign Out
+          </button>
         </template>
         <template v-else>
-          <RouterLink to="/login"    @click="menuOpen = false">Sign In</RouterLink>
-          <RouterLink to="/register" @click="menuOpen = false">Join</RouterLink>
+          <RouterLink
+            to="/login"
+            @click="menuOpen = false"
+          >
+            Sign In
+          </RouterLink>
+          <RouterLink
+            to="/register"
+            @click="menuOpen = false"
+          >
+            Join
+          </RouterLink>
         </template>
       </div>
     </Transition>

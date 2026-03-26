@@ -1,21 +1,39 @@
 <template>
   <div class="admin-comments">
-    <h1 class="display-font admin-title">Comments</h1>
-    <hr class="gold-rule" />
+    <h1 class="display-font admin-title">
+      Comments
+    </h1>
+    <hr class="gold-rule">
 
     <div class="comments-list">
-      <div v-for="c in comments" :key="c.id" class="comment-card card">
+      <div
+        v-for="c in comments"
+        :key="c.id"
+        class="comment-card card"
+      >
         <div class="comment-header">
           <span class="comment-author">{{ c.authorName }}</span>
           <span class="text-muted comment-target">on {{ c.artifactType }} #{{ c.artifactId }}</span>
           <span class="text-muted comment-date">{{ formatDate(c.createdAt) }}</span>
         </div>
-        <p class="comment-text">{{ c.text }}</p>
+        <p class="comment-text">
+          {{ c.text }}
+        </p>
         <div class="comment-actions">
-          <button class="btn btn-danger btn-xs" @click="deleteComment(c.id)">Delete</button>
+          <button
+            class="btn btn-danger btn-xs"
+            @click="deleteComment(c.id)"
+          >
+            Delete
+          </button>
         </div>
       </div>
-      <div v-if="!comments.length" class="empty text-muted">No comments found.</div>
+      <div
+        v-if="!comments.length"
+        class="empty text-muted"
+      >
+        No comments found.
+      </div>
     </div>
   </div>
 </template>
@@ -35,7 +53,7 @@ async function load() {
   try {
     const { data } = await api.get('/admin/comments')
     comments.value = data.comments || data || []
-  } catch {}
+  } catch { /* ignored */ }
 }
 
 async function deleteComment(id) {
@@ -43,7 +61,7 @@ async function deleteComment(id) {
   try {
     await api.delete(`/comments/${id}`)
     load()
-  } catch {}
+  } catch { /* ignored */ }
 }
 
 onMounted(load)

@@ -1,23 +1,53 @@
 <template>
-  <div class="story-page" v-if="story">
+  <div
+    v-if="story"
+    class="story-page"
+  >
     <div class="page-header">
-      <RouterLink to="/stories" class="back-link text-muted">← Stories</RouterLink>
-      <span v-if="story.topic" class="badge story-topic">{{ story.topic }}</span>
-      <h1 class="display-font story-title">{{ story.title }}</h1>
+      <RouterLink
+        to="/stories"
+        class="back-link text-muted"
+      >
+        ← Stories
+      </RouterLink>
+      <span
+        v-if="story.topic"
+        class="badge story-topic"
+      >{{ story.topic }}</span>
+      <h1 class="display-font story-title">
+        {{ story.title }}
+      </h1>
       <div class="story-meta">
-        <span v-if="story.dateDisplay" class="text-muted">{{ story.dateDisplay }}</span>
-        <span v-if="story.people?.length" class="text-muted"> · {{ story.people.map(p => p.name).join(', ') }}</span>
+        <span
+          v-if="story.dateDisplay"
+          class="text-muted"
+        >{{ story.dateDisplay }}</span>
+        <span
+          v-if="story.people?.length"
+          class="text-muted"
+        > · {{ story.people.map(p => p.name).join(', ') }}</span>
       </div>
-      <hr class="gold-rule" />
+      <hr class="gold-rule">
     </div>
 
-    <article class="story-body" v-html="story.body" />
+    <article
+      class="story-body"
+      v-html="story.body"
+    />
 
     <div class="story-footer">
-      <div class="tagged-people" v-if="story.people?.length">
+      <div
+        v-if="story.people?.length"
+        class="tagged-people"
+      >
         <span class="section-label">People in this story</span>
         <div class="people-chips">
-          <RouterLink v-for="p in story.people" :key="p.id" :to="`/tree?person=${p.id}`" class="person-chip">
+          <RouterLink
+            v-for="p in story.people"
+            :key="p.id"
+            :to="`/tree?person=${p.id}`"
+            class="person-chip"
+          >
             {{ p.name }}
           </RouterLink>
         </div>
@@ -25,13 +55,27 @@
     </div>
 
     <div class="story-comments">
-      <CommentSection v-if="auth.isLoggedIn" :artifact-id="story.id" artifact-type="story" />
-      <div v-else class="comment-gate text-muted">
-        <RouterLink to="/login">Sign in</RouterLink> to view and post comments.
+      <CommentSection
+        v-if="auth.isLoggedIn"
+        :artifact-id="story.id"
+        artifact-type="story"
+      />
+      <div
+        v-else
+        class="comment-gate text-muted"
+      >
+        <RouterLink to="/login">
+          Sign in
+        </RouterLink> to view and post comments.
       </div>
     </div>
   </div>
-  <div v-else-if="loading" class="loading text-muted">Loading story...</div>
+  <div
+    v-else-if="loading"
+    class="loading text-muted"
+  >
+    Loading story...
+  </div>
 </template>
 
 <script setup>

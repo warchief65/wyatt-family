@@ -1,109 +1,193 @@
 <template>
-  <div class="slideshow" @keydown.left="prev" @keydown.right="next" @keydown.esc="$emit('close')" tabindex="0" ref="el">
+  <div
+    ref="el"
+    class="slideshow"
+    tabindex="0"
+    @keydown.esc="$emit('close')"
+  >
     <div class="ss-controls top">
-      <button class="btn btn-ghost btn-sm" @click="$emit('close')">✕ Exit</button>
-      <div class="ss-info display-font">{{ current.title }}</div>
-      <div class="ss-counter text-muted">{{ index + 1 }} / {{ items.length }}</div>
+      <button
+        class="btn btn-ghost btn-sm"
+        @click="$emit('close')"
+      >
+        ✕ Exit
+      </button>
+      <div class="ss-info display-font">
+        {{ currentItem.title }}
+      </div>
+      <div class="ss-counter text-muted">
+        {{ currentSlide + 1 }} / {{ items.length }}
+      </div>
     </div>
 
-    <div class="ss-stage" @touchstart="onTouchStart" @touchend="onTouchEnd">
-      <button class="ss-prev" @click="prev">‹</button>
-      <Transition name="fade" mode="out-in">
-        <div :key="current.id" class="ss-media-wrap">
-          <video v-if="current.type === 'video'" :src="current.url" controls class="ss-media" />
-          <img   v-else :src="current.url || current.thumbnailUrl" :alt="current.title" class="ss-media" />
-        </div>
-      </Transition>
-      <button class="ss-next" @click="next">›</button>
+    <!-- Main carousel -->
+    <div
+      class="ss-stage"
+      :style="{ height: stageHeight + 'px' }"
+    >
+      <Carousel
+        ref="mainCarousel"
+        v-model="currentSlide"
+        :items-to-show="1"
+        :wrap-around="loop"
+        :transition="500"
+        :autoplay="playing ? Number(speed) : 0"
+        :pause-autoplay-on-hover="true"
+      >
+        <Slide
+          v-for="(item, i) in items"
+          :key="item.id || i"
+        >
+          <div class="ss-media-wrap">
+            <video
+              v-if="item.type === 'video'"
+              :src="item.url"
+              controls
+              class="ss-media"
+            />
+            <img
+              v-else
+              :src="item.url || item.thumbnailUrl"
+              :alt="item.title"
+              class="ss-media"
+            >
+          </div>
+        </Slide>
+
+        <template #addons>
+          <Navigation />
+        </template>
+      </Carousel>
     </div>
 
     <!-- Metadata overlay -->
     <div class="ss-meta">
-      <div v-if="current.dateDisplay" class="text-muted">{{ current.dateDisplay }}</div>
-      <div v-if="current.location"    class="text-muted">{{ current.location }}</div>
-      <div v-if="current.description" class="text-muted mt-1">{{ current.description }}</div>
-      <div v-if="current.people?.length" class="ss-tags mt-1">
-        <span v-for="p in current.people" :key="p" class="badge">{{ p }}</span>
+      <div
+        v-if="currentItem.dateDisplay"
+        class="text-muted"
+      >
+        {{ currentItem.dateDisplay }}
       </div>
+      <div
+        v-if="currentItem.location"
+        class="text-muted"
+      >
+        {{ currentItem.location }}
+      </div>
+      <div
+        v-if="currentItem.description"
+        class="text-muted mt-1"
+      >
+        {{ currentItem.description }}
+      </div>
+      <div
+        v-if="currentItem.people?.length"
+        class="ss-tags mt-1"
+      >
+        <span
+          v-for="p in currentItem.people"
+          :key="p"
+          class="badge"
+        >{{ p }}</span>
+      </div>
+    </div>
+
+    <!-- Thumbnail gallery carousel -->
+    <div class="ss-thumbs">
+      <Carousel
+        ref="thumbCarousel"
+        v-model="currentSlide"
+        :items-to-show="thumbCount"
+        :wrap-around="false"
+        :gap="8"
+      >
+        <Slide
+          v-for="(item, i) in items"
+          :key="'t-' + (item.id || i)"
+        >
+          <div
+            class="thumb-item"
+            :class="{ active: currentSlide === i }"
+            @click="currentSlide = i"
+          >
+            <img
+              v-if="item.thumbnailUrl"
+              :src="item.thumbnailUrl"
+              :alt="item.title"
+            >
+            <div
+              v-else
+              class="thumb-placeholder"
+            >
+              <span v-if="item.type === 'video'">▶</span>
+              <span v-else>📷</span>
+            </div>
+          </div>
+        </Slide>
+      </Carousel>
     </div>
 
     <!-- Playback controls -->
     <div class="ss-controls bottom">
       <label class="text-muted">Speed</label>
-      <select v-model="speed" class="speed-select">
-        <option value="2000">Fast (2s)</option>
-        <option value="4000">Normal (4s)</option>
-        <option value="7000">Slow (7s)</option>
+      <select
+        v-model="speed"
+        class="speed-select"
+      >
+        <option value="2000">
+          Fast (2s)
+        </option>
+        <option value="4000">
+          Normal (4s)
+        </option>
+        <option value="7000">
+          Slow (7s)
+        </option>
       </select>
-      <button class="btn btn-secondary btn-sm" @click="togglePlay">
+      <button
+        class="btn btn-secondary btn-sm"
+        @click="playing = !playing"
+      >
         {{ playing ? '⏸ Pause' : '▶ Play' }}
       </button>
       <label class="text-muted">
-        <input type="checkbox" v-model="loop" /> Loop
+        <input
+          v-model="loop"
+          type="checkbox"
+        > Loop
       </label>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useWindowSize } from '@vueuse/core'
+import { Carousel, Slide, Navigation } from 'vue3-carousel'
+import 'vue3-carousel/dist/carousel.css'
 
 const props = defineProps({
   items:      { type: Array,  required: true },
   startIndex: { type: Number, default: 0 }
 })
-const emit = defineEmits(['close'])
+defineEmits(['close'])
 
-const index   = ref(props.startIndex)
-const playing = ref(false)
-const speed   = ref(4000)
-const loop    = ref(true)
-const el      = ref(null)
-let   timer   = null
+const currentSlide  = ref(props.startIndex)
+const playing       = ref(false)
+const speed         = ref(4000)
+const loop          = ref(true)
+const el            = ref(null)
+const mainCarousel  = ref(null)
+const thumbCarousel = ref(null)
 
-const current = computed(() => props.items[index.value] || {})
+const { height: winH } = useWindowSize()
+// Reserve: top bar(42) + meta(40) + thumb strip(104) + bottom bar(42) + breathing room(12) = 240
+const stageHeight = computed(() => Math.max(200, winH.value - 240))
 
-function next() {
-  if (index.value < props.items.length - 1) {
-    index.value++
-  } else if (loop.value) {
-    index.value = 0
-  } else {
-    stopPlay()
-  }
-}
-
-function prev() {
-  if (index.value > 0) index.value--
-}
-
-function togglePlay() {
-  playing.value ? stopPlay() : startPlay()
-}
-
-function startPlay() {
-  playing.value = true
-  timer = setInterval(next, Number(speed.value))
-}
-
-function stopPlay() {
-  playing.value = false
-  clearInterval(timer)
-}
-
-watch(speed, () => { if (playing.value) { stopPlay(); startPlay() } })
-
-// Touch swipe
-let touchX = 0
-function onTouchStart(e) { touchX = e.touches[0].clientX }
-function onTouchEnd(e) {
-  const dx = e.changedTouches[0].clientX - touchX
-  if (dx > 50) prev()
-  else if (dx < -50) next()
-}
+const thumbCount = computed(() => Math.min(props.items.length, 8))
+const currentItem = computed(() => props.items[currentSlide.value] || {})
 
 onMounted(() => el.value?.focus())
-onUnmounted(() => clearInterval(timer))
 </script>
 
 <style scoped>
@@ -114,6 +198,7 @@ onUnmounted(() => clearInterval(timer))
   z-index: 900;
   display: flex;
   flex-direction: column;
+  height: 100vh;
   outline: none;
 }
 
@@ -133,29 +218,41 @@ onUnmounted(() => clearInterval(timer))
 .ss-counter { font-size: 12px; }
 
 .ss-stage {
-  flex: 1;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.ss-stage :deep(.carousel) {
+  width: 100% !important;
+  height: 100% !important;
+}
+.ss-stage :deep(.carousel__viewport) {
+  height: 100% !important;
+}
+.ss-stage :deep(.carousel__track) {
+  height: 100% !important;
+}
+.ss-stage :deep(.carousel__slide) {
+  height: 100% !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
 }
 
-.ss-prev, .ss-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.4);
+/* Navigation arrows */
+.ss-stage :deep(.carousel__prev),
+.ss-stage :deep(.carousel__next) {
+  background: rgba(0, 0, 0, 0.4);
   border: 1px solid var(--color-border-gold);
   color: var(--color-gold);
-  font-size: 32px;
-  padding: 10px 16px;
-  cursor: pointer;
-  z-index: 2;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-sm);
 }
-.ss-prev { left: 1rem; }
-.ss-next { right: 1rem; }
+.ss-stage :deep(.carousel__prev:hover),
+.ss-stage :deep(.carousel__next:hover) {
+  background: rgba(0, 0, 0, 0.7);
+}
 
 .ss-media-wrap {
   display: flex;
@@ -167,16 +264,61 @@ onUnmounted(() => clearInterval(timer))
 .ss-media {
   max-width: 90%;
   max-height: 100%;
+  width: auto;
+  height: auto;
   object-fit: contain;
+  display: block;
 }
 
 .ss-meta {
   padding: 8px 2rem;
   text-align: center;
   font-size: 13px;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
 }
 .ss-tags { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; }
+
+/* Thumbnail gallery strip */
+.ss-thumbs {
+  padding: 10px 2rem;
+  background: var(--color-bg-surface);
+  border-top: 1px solid var(--color-border);
+}
+.ss-thumbs :deep(.carousel__slide) {
+  padding: 0 4px;
+}
+.thumb-item {
+  width: 100%;
+  height: 150px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  opacity: 0.5;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.thumb-item.active {
+  border-color: var(--color-gold);
+  opacity: 1;
+}
+.thumb-item:hover {
+  opacity: 0.85;
+}
+.thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--color-text-faint);
+  background: var(--color-bg);
+}
 
 .speed-select {
   width: auto;

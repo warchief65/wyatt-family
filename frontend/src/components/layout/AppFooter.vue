@@ -1,23 +1,46 @@
 <template>
   <footer class="app-footer">
     <div class="footer-brand">
-      <img src="/crest.png" alt="Wyatt Crest" class="footer-crest" />
+      <img
+        src="/crest.png"
+        alt="Wyatt Crest"
+        class="footer-crest"
+      >
       <div>
-        <div class="display-font footer-name">Wyatt Family</div>
-        <div class="footer-url">alanwyatt.com</div>
+        <div class="display-font footer-name">
+          Wyatt Family
+        </div>
+        <div class="footer-url">
+          alanwyatt.com
+        </div>
       </div>
     </div>
 
     <div class="footer-links">
-      <RouterLink to="/photos">Photos</RouterLink>
-      <RouterLink to="/tree">Family Tree</RouterLink>
-      <RouterLink to="/documents">Documents</RouterLink>
-      <RouterLink to="/stories">Stories</RouterLink>
+      <RouterLink to="/photos">
+        Photos
+      </RouterLink>
+      <RouterLink to="/tree">
+        Family Tree
+      </RouterLink>
+      <RouterLink to="/documents">
+        Documents
+      </RouterLink>
+      <RouterLink to="/stories">
+        Stories
+      </RouterLink>
     </div>
 
     <div class="footer-right">
-      <RouterLink to="/donate" class="btn btn-secondary btn-sm donate-btn">♥ Support This Site</RouterLink>
-      <div class="footer-copy">&copy; {{ year }} Alan Wyatt &nbsp;·&nbsp; alanwyatt.com</div>
+      <RouterLink
+        to="/donate"
+        class="btn btn-secondary btn-sm donate-btn"
+      >
+        ♥ Support This Site
+      </RouterLink>
+      <div class="footer-copy">
+        &copy; {{ year }} Alan Wyatt &nbsp;·&nbsp; alanwyatt.com
+      </div>
     </div>
   </footer>
 </template>

@@ -1,28 +1,79 @@
 <template>
   <div class="photos-page">
     <div class="page-header">
-      <h1 class="display-font page-title">Photos &amp; Videos</h1>
-      <hr class="gold-rule" />
+      <h1 class="display-font page-title">
+        Photos &amp; Videos
+      </h1>
+      <hr class="gold-rule">
     </div>
 
     <!-- Filters -->
     <div class="filters">
-      <input v-model="filters.q" placeholder="Search photos..." @input="load" class="filter-input" />
-      <select v-model="filters.person" @change="load">
-        <option value="">All People</option>
-        <option v-for="p in people" :key="p.id" :value="p.id">{{ p.name }}</option>
+      <input
+        v-model="filters.q"
+        placeholder="Search photos..."
+        class="filter-input"
+        @input="load"
+      >
+      <select
+        v-model="filters.person"
+        @change="load"
+      >
+        <option value="">
+          All People
+        </option>
+        <option
+          v-for="p in people"
+          :key="p.id"
+          :value="p.id"
+        >
+          {{ p.name }}
+        </option>
       </select>
-      <select v-model="filters.tag" @change="load">
-        <option value="">All Tags</option>
-        <option v-for="t in tags" :key="t" :value="t">{{ t }}</option>
+      <select
+        v-model="filters.tag"
+        @change="load"
+      >
+        <option value="">
+          All Tags
+        </option>
+        <option
+          v-for="t in tags"
+          :key="t"
+          :value="t"
+        >
+          {{ t }}
+        </option>
       </select>
-      <input v-model="filters.from" type="number" placeholder="From year" @input="load" class="year-input" />
-      <input v-model="filters.to"   type="number" placeholder="To year"   @input="load" class="year-input" />
+      <input
+        v-model="filters.from"
+        type="number"
+        placeholder="From year"
+        class="year-input"
+        @input="load"
+      >
+      <input
+        v-model="filters.to"
+        type="number"
+        placeholder="To year"
+        class="year-input"
+        @input="load"
+      >
     </div>
 
     <div class="photos-content">
-      <div v-if="loading" class="loading text-muted">Loading...</div>
-      <div v-else-if="!albums.length" class="empty text-muted">No albums found.</div>
+      <div
+        v-if="loading"
+        class="loading text-muted"
+      >
+        Loading...
+      </div>
+      <div
+        v-else-if="!albums.length"
+        class="empty text-muted"
+      >
+        No albums found.
+      </div>
       <template v-else>
         <!-- Album grid -->
         <div class="albums-grid">
@@ -33,14 +84,35 @@
             class="album-card card"
           >
             <div class="album-thumb">
-              <img v-if="album.coverUrl" :src="album.coverUrl" :alt="album.title" />
-              <div v-else class="thumb-placeholder">📷</div>
-              <span v-if="album.isPrivate" class="badge badge-private album-badge">Private</span>
+              <img
+                v-if="album.coverUrl"
+                :src="album.coverUrl"
+                :alt="album.title"
+              >
+              <div
+                v-else
+                class="thumb-placeholder"
+              >
+                📷
+              </div>
+              <span
+                v-if="album.isPrivate"
+                class="badge badge-private album-badge"
+              >Private</span>
             </div>
             <div class="album-meta">
-              <div class="album-title">{{ album.title }}</div>
-              <div class="album-sub text-muted">{{ album.itemCount }} items · {{ album.dateDisplay }}</div>
-              <div v-if="album.branch" class="album-branch text-muted">{{ album.branch }}</div>
+              <div class="album-title">
+                {{ album.title }}
+              </div>
+              <div class="album-sub text-muted">
+                {{ album.itemCount }} items · {{ album.dateDisplay }}
+              </div>
+              <div
+                v-if="album.branch"
+                class="album-branch text-muted"
+              >
+                {{ album.branch }}
+              </div>
             </div>
           </RouterLink>
         </div>

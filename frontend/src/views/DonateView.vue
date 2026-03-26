@@ -1,9 +1,15 @@
 <template>
   <div class="donate-page">
     <div class="page-header">
-      <img src="/crest.png" alt="Wyatt Crest" class="donate-crest" />
-      <h1 class="display-font page-title">Support This Site</h1>
-      <hr class="gold-rule" />
+      <img
+        src="/crest.png"
+        alt="Wyatt Crest"
+        class="donate-crest"
+      >
+      <h1 class="display-font page-title">
+        Support This Site
+      </h1>
+      <hr class="gold-rule">
       <p class="text-muted donate-sub">
         alanwyatt.com is a free, family-run archive. Any contribution helps cover
         hosting, storage, and domain costs (approximately $12/month).
@@ -12,69 +18,138 @@
     </div>
 
     <div class="donate-content">
-      <form @submit.prevent="handleDonate" v-if="!success">
+      <form
+        v-if="!success"
+        @submit.prevent="handleDonate"
+      >
         <!-- Amount selection -->
         <div class="form-group">
           <label>Donation Amount</label>
           <div class="amount-grid">
-            <button v-for="a in presets" :key="a" type="button"
+            <button
+              v-for="a in presets"
+              :key="a"
+              type="button"
               :class="['amount-btn btn', form.amount === a && 'btn-primary', form.amount !== a && 'btn-secondary']"
-              @click="form.amount = a; customAmount = ''">
+              @click="form.amount = a; customAmount = ''"
+            >
               ${{ a }}
             </button>
-            <button type="button" :class="['amount-btn btn', customAmount && 'btn-primary', !customAmount && 'btn-secondary']"
-              @click="customAmount = ''; form.amount = 0">
+            <button
+              type="button"
+              :class="['amount-btn btn', customAmount && 'btn-primary', !customAmount && 'btn-secondary']"
+              @click="customAmount = ''; form.amount = 0"
+            >
               Custom
             </button>
           </div>
-          <input v-if="!form.amount || customAmount !== undefined && customAmount !== ''"
+          <input
+            v-if="!form.amount || customAmount !== undefined && customAmount !== ''"
             v-model.number="customAmount"
-            type="number" min="1" step="1" placeholder="Enter amount ($)"
-            class="mt-1" @input="form.amount = Number(customAmount)" />
+            type="number"
+            min="1"
+            step="1"
+            placeholder="Enter amount ($)"
+            class="mt-1"
+            @input="form.amount = Number(customAmount)"
+          >
         </div>
 
         <div class="form-group">
           <label>Your Name <span class="text-muted">(optional)</span></label>
-          <input v-model="form.donorName" type="text" placeholder="Thomas Wyatt" />
+          <input
+            v-model="form.donorName"
+            type="text"
+            placeholder="Thomas Wyatt"
+          >
         </div>
 
         <div class="form-group">
           <label>Message <span class="text-muted">(optional)</span></label>
-          <textarea v-model="form.donorMessage" rows="2" placeholder="A kind word for the family..." />
+          <textarea
+            v-model="form.donorMessage"
+            rows="2"
+            placeholder="A kind word for the family..."
+          />
         </div>
 
         <div class="form-group public-toggle">
           <label class="toggle-label">
-            <input type="checkbox" v-model="form.isPublic" />
+            <input
+              v-model="form.isPublic"
+              type="checkbox"
+            >
             Display my name on the public Thank You page
           </label>
         </div>
 
-        <div id="stripe-element" class="stripe-element" />
-        <p v-if="stripeError" class="error-msg">{{ stripeError }}</p>
+        <div
+          id="stripe-element"
+          class="stripe-element"
+        />
+        <p
+          v-if="stripeError"
+          class="error-msg"
+        >
+          {{ stripeError }}
+        </p>
 
-        <p class="secure-note text-muted">🔒 Payments are processed securely by Stripe. We never store your card details.</p>
+        <p class="secure-note text-muted">
+          🔒 Payments are processed securely by Stripe. We never store your card details.
+        </p>
 
-        <button class="btn btn-primary donate-btn" type="submit" :disabled="loading || !form.amount">
+        <button
+          class="btn btn-primary donate-btn"
+          type="submit"
+          :disabled="loading || !form.amount"
+        >
           {{ loading ? 'Processing...' : `Donate $${form.amount || ''}` }}
         </button>
       </form>
 
-      <div v-else class="success-msg">
-        <div class="success-icon">♥</div>
+      <div
+        v-else
+        class="success-msg"
+      >
+        <div class="success-icon">
+          ♥
+        </div>
         <h3>Thank You!</h3>
-        <p class="text-muted">Your generosity helps keep the Wyatt family archive alive and growing. We're grateful.</p>
-        <RouterLink to="/" class="btn btn-secondary mt-2">Return Home</RouterLink>
+        <p class="text-muted">
+          Your generosity helps keep the Wyatt family archive alive and growing. We're grateful.
+        </p>
+        <RouterLink
+          to="/"
+          class="btn btn-secondary mt-2"
+        >
+          Return Home
+        </RouterLink>
       </div>
 
       <!-- Public donors -->
-      <div class="donors-section" v-if="donors.length">
-        <h3 class="section-label">Thank You to Our Supporters</h3>
-        <hr class="gold-rule" />
+      <div
+        v-if="donors.length"
+        class="donors-section"
+      >
+        <h3 class="section-label">
+          Thank You to Our Supporters
+        </h3>
+        <hr class="gold-rule">
         <div class="donors-list">
-          <div v-for="d in donors" :key="d.donorName + d.createdAt" class="donor-item">
-            <div class="donor-name text-gold">{{ d.donorName }}</div>
-            <div v-if="d.donorMessage" class="donor-msg text-muted">"{{ d.donorMessage }}"</div>
+          <div
+            v-for="d in donors"
+            :key="d.donorName + d.createdAt"
+            class="donor-item"
+          >
+            <div class="donor-name text-gold">
+              {{ d.donorName }}
+            </div>
+            <div
+              v-if="d.donorMessage"
+              class="donor-msg text-muted"
+            >
+              "{{ d.donorMessage }}"
+            </div>
           </div>
         </div>
       </div>
@@ -84,10 +159,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import api from '@/services/api'
-
-const router       = useRouter()
 const loading      = ref(false)
 const success      = ref(false)
 const stripeError  = ref('')
@@ -124,12 +196,12 @@ onMounted(async () => {
   try {
     const { data } = await api.get('/donations/public')
     donors.value = data
-  } catch {}
+  } catch { /* ignored */ }
 })
 </script>
 
 <style scoped>
-.page-header { padding: 2rem 2rem 0; text-align: center; }
+.page-header { padding: 2rem 2rem 0;
 .donate-crest { width: 70px; height: 70px; object-fit: contain; margin-bottom: 1rem; opacity: 0.85; }
 .page-title   { font-size: 40px; margin-bottom: 8px; }
 .donate-sub   { font-size: 14px; max-width: 540px; margin: 0 auto; line-height: 1.7; }

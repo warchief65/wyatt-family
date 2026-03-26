@@ -1,98 +1,202 @@
 <template>
   <div class="submit-page">
     <div class="page-header">
-      <h1 class="display-font page-title">Submit Content</h1>
-      <p class="text-muted page-sub">Share photos, videos, documents or stories for the family archive. All submissions are reviewed by the administrator before publishing.</p>
-      <hr class="gold-rule" />
+      <h1 class="display-font page-title">
+        Submit Content
+      </h1>
+      <p class="text-muted page-sub">
+        Share photos, videos, documents or stories for the family archive. All submissions are reviewed by the administrator before publishing.
+      </p>
+      <hr class="gold-rule">
     </div>
 
     <div class="submit-content">
-      <form @submit.prevent="handleSubmit" v-if="!submitted">
+      <form
+        v-if="!submitted"
+        @submit.prevent="handleSubmit"
+      >
         <div class="form-group">
           <label>Content Type</label>
-          <select v-model="form.contentType" required>
-            <option value="">Select type...</option>
-            <option value="photo">Photo(s)</option>
-            <option value="video">Video</option>
-            <option value="document">Document / Artifact</option>
-            <option value="story">Story / Article</option>
+          <select
+            v-model="form.contentType"
+            required
+          >
+            <option value="">
+              Select type...
+            </option>
+            <option value="photo">
+              Photo(s)
+            </option>
+            <option value="video">
+              Video
+            </option>
+            <option value="document">
+              Document / Artifact
+            </option>
+            <option value="story">
+              Story / Article
+            </option>
           </select>
         </div>
 
         <div class="form-group">
           <label>Title</label>
-          <input v-model="form.title" type="text" required placeholder="Brief descriptive title" />
+          <input
+            v-model="form.title"
+            type="text"
+            required
+            placeholder="Brief descriptive title"
+          >
         </div>
 
         <div class="form-group">
           <label>Description</label>
-          <textarea v-model="form.description" rows="4" placeholder="Tell us about this content — the more detail the better!" />
+          <textarea
+            v-model="form.description"
+            rows="4"
+            placeholder="Tell us about this content — the more detail the better!"
+          />
         </div>
 
         <!-- File upload -->
         <div class="form-group">
           <label>File(s)</label>
-          <div class="file-drop" @dragover.prevent @drop.prevent="onDrop" @click="fileInput.click()">
-            <div v-if="!files.length" class="drop-hint">
+          <div
+            class="file-drop"
+            @dragover.prevent
+            @drop.prevent="onDrop"
+            @click="fileInput.click()"
+          >
+            <div
+              v-if="!files.length"
+              class="drop-hint"
+            >
               <span class="text-gold">Click to browse</span> or drag & drop files here
             </div>
-            <div v-else class="file-list">
-              <div v-for="(f, i) in files" :key="i" class="file-item">
+            <div
+              v-else
+              class="file-list"
+            >
+              <div
+                v-for="(f, i) in files"
+                :key="`${f.name}-${f.size}-${f.lastModified}`"
+                class="file-item"
+              >
                 <span>{{ f.name }}</span>
-                <button type="button" @click.stop="files.splice(i,1)">✕</button>
+                <button
+                  type="button"
+                  @click.stop="files.splice(i,1)"
+                >
+                  ✕
+                </button>
               </div>
             </div>
           </div>
-          <input ref="fileInput" type="file" multiple hidden @change="onFileChange" accept="image/*,video/*,.pdf,.tiff" />
+          <input
+            ref="fileInput"
+            type="file"
+            multiple
+            hidden
+            accept="image/*,video/*,.pdf,.tiff"
+            @change="onFileChange"
+          >
         </div>
 
         <!-- Shared metadata -->
         <div class="meta-section">
-          <h3 class="section-label">Metadata <span class="text-muted">(helps with search)</span></h3>
-          <hr class="gold-rule" />
+          <h3 class="section-label">
+            Metadata <span class="text-muted">(helps with search)</span>
+          </h3>
+          <hr class="gold-rule">
 
           <div class="form-row">
             <div class="form-group">
               <label>Date</label>
-              <input v-model="form.date" type="text" placeholder="e.g. July 1962 or circa 1940" />
+              <input
+                v-model="form.date"
+                type="text"
+                placeholder="e.g. July 1962 or circa 1940"
+              >
             </div>
             <div class="form-group">
               <label>Location</label>
-              <input v-model="form.location" type="text" placeholder="e.g. Memphis, TN" />
+              <input
+                v-model="form.location"
+                type="text"
+                placeholder="e.g. Memphis, TN"
+              >
             </div>
           </div>
 
           <div class="form-group">
             <label>People in this content (comma separated)</label>
-            <input v-model="form.people" type="text" placeholder="e.g. Robert Wyatt, Mary Wyatt" />
+            <input
+              v-model="form.people"
+              type="text"
+              placeholder="e.g. Robert Wyatt, Mary Wyatt"
+            >
           </div>
 
           <div class="form-group">
             <label>Tags (comma separated)</label>
-            <input v-model="form.tags" type="text" placeholder="e.g. wedding, military, childhood" />
+            <input
+              v-model="form.tags"
+              type="text"
+              placeholder="e.g. wedding, military, childhood"
+            >
           </div>
 
           <div class="form-group">
             <label>Source / Where did you get this?</label>
-            <input v-model="form.source" type="text" placeholder="e.g. Found in Aunt Helen's attic, 2024" />
+            <input
+              v-model="form.source"
+              type="text"
+              placeholder="e.g. Found in Aunt Helen's attic, 2024"
+            >
           </div>
         </div>
 
-        <p v-if="error" class="error-msg">{{ error }}</p>
+        <p
+          v-if="error"
+          class="error-msg"
+        >
+          {{ error }}
+        </p>
 
-        <button class="btn btn-primary submit-btn" type="submit" :disabled="loading || !files.length">
+        <button
+          class="btn btn-primary submit-btn"
+          type="submit"
+          :disabled="loading || !files.length"
+        >
           {{ loading ? 'Submitting...' : 'Submit for Review' }}
         </button>
       </form>
 
       <!-- Success -->
-      <div v-else class="success-msg">
-        <div class="success-icon">✓</div>
+      <div
+        v-else
+        class="success-msg"
+      >
+        <div class="success-icon">
+          ✓
+        </div>
         <h3>Submission Received!</h3>
-        <p class="text-muted">Thank you! Your submission has been logged and the administrator will review it shortly. You'll receive an email with the outcome.</p>
+        <p class="text-muted">
+          Thank you! Your submission has been logged and the administrator will review it shortly. You'll receive an email with the outcome.
+        </p>
         <div class="success-actions">
-          <button class="btn btn-secondary" @click="reset">Submit Another</button>
-          <RouterLink to="/profile" class="btn btn-ghost">View My Submissions</RouterLink>
+          <button
+            class="btn btn-secondary"
+            @click="reset"
+          >
+            Submit Another
+          </button>
+          <RouterLink
+            to="/profile"
+            class="btn btn-ghost"
+          >
+            View My Submissions
+          </RouterLink>
         </div>
       </div>
     </div>
@@ -114,8 +218,30 @@ const form = ref({
   date: '', location: '', people: '', tags: '', source: ''
 })
 
-function onFileChange(e) { files.value = [...files.value, ...e.target.files] }
-function onDrop(e)       { files.value = [...files.value, ...e.dataTransfer.files] }
+const ACCEPTED_TYPES = ['image/', 'video/', 'application/pdf', 'image/tiff']
+const MAX_TOTAL_BYTES = 200_000_000
+
+function isAcceptedFile(file) {
+  return ACCEPTED_TYPES.some(t => file.type.startsWith(t))
+}
+
+function onFileChange(e) {
+  files.value = [...files.value, ...e.target.files]
+  e.target.value = ''
+}
+
+function onDrop(e) {
+  const dropped = [...e.dataTransfer.files].filter(isAcceptedFile)
+  if (dropped.length !== e.dataTransfer.files.length) {
+    error.value = 'Some files were skipped because they are not an accepted type.'
+  }
+  const totalSize = [...files.value, ...dropped].reduce((sum, f) => sum + f.size, 0)
+  if (totalSize > MAX_TOTAL_BYTES) {
+    error.value = 'Total file size exceeds 200 MB limit.'
+    return
+  }
+  files.value = [...files.value, ...dropped]
+}
 
 async function handleSubmit() {
   error.value   = ''

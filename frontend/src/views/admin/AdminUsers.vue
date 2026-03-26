@@ -1,18 +1,31 @@
 <template>
   <div class="admin-users">
-    <h1 class="display-font admin-title">Users</h1>
-    <hr class="gold-rule" />
+    <h1 class="display-font admin-title">
+      Users
+    </h1>
+    <hr class="gold-rule">
 
     <div class="toolbar">
       <div class="filter-tabs">
-        <button v-for="s in statuses" :key="s.value"
+        <button
+          v-for="s in statuses"
+          :key="s.value"
           :class="['btn btn-ghost btn-sm', filter === s.value && 'active']"
-          @click="filter = s.value; load()">
+          @click="filter = s.value; load()"
+        >
           {{ s.label }}
-          <span v-if="s.count" class="tab-count">{{ s.count }}</span>
+          <span
+            v-if="s.count"
+            class="tab-count"
+          >{{ s.count }}</span>
         </button>
       </div>
-      <input v-model="search" placeholder="Search users..." class="search-input" @input="load" />
+      <input
+        v-model="search"
+        placeholder="Search users..."
+        class="search-input"
+        @input="load"
+      >
     </div>
 
     <div class="user-table">
@@ -27,22 +40,63 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="u in users" :key="u.id">
+          <tr
+            v-for="u in users"
+            :key="u.id"
+          >
             <td>{{ u.firstName }} {{ u.lastName }}</td>
-            <td class="text-muted">{{ u.email }}</td>
+            <td class="text-muted">
+              {{ u.email }}
+            </td>
             <td><span :class="`badge badge-${u.status}`">{{ u.status }}</span></td>
-            <td class="text-muted">{{ formatDate(u.createdAt) }}</td>
+            <td class="text-muted">
+              {{ formatDate(u.createdAt) }}
+            </td>
             <td class="actions">
-              <button v-if="u.status === 'pending'"  class="btn btn-primary btn-xs"  @click="approve(u.id)">Approve</button>
-              <button v-if="u.status === 'pending'"  class="btn btn-danger  btn-xs"  @click="reject(u.id)">Reject</button>
-              <button v-if="u.status === 'approved'" class="btn btn-ghost   btn-xs"  @click="deactivate(u.id)">Deactivate</button>
-              <button v-if="u.status === 'inactive'" class="btn btn-ghost   btn-xs"  @click="approve(u.id)">Reactivate</button>
-              <button class="btn btn-danger btn-xs" @click="deleteUser(u.id)">Delete</button>
+              <button
+                v-if="u.status === 'pending'"
+                class="btn btn-primary btn-xs"
+                @click="approve(u.id)"
+              >
+                Approve
+              </button>
+              <button
+                v-if="u.status === 'pending'"
+                class="btn btn-danger  btn-xs"
+                @click="reject(u.id)"
+              >
+                Reject
+              </button>
+              <button
+                v-if="u.status === 'approved'"
+                class="btn btn-ghost   btn-xs"
+                @click="deactivate(u.id)"
+              >
+                Deactivate
+              </button>
+              <button
+                v-if="u.status === 'inactive'"
+                class="btn btn-ghost   btn-xs"
+                @click="approve(u.id)"
+              >
+                Reactivate
+              </button>
+              <button
+                class="btn btn-danger btn-xs"
+                @click="deleteUser(u.id)"
+              >
+                Delete
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
-      <div v-if="!users.length" class="empty text-muted">No users found.</div>
+      <div
+        v-if="!users.length"
+        class="empty text-muted"
+      >
+        No users found.
+      </div>
     </div>
   </div>
 </template>

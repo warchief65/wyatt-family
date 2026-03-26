@@ -1,39 +1,82 @@
 <template>
   <div class="admin-dashboard">
-    <h1 class="display-font admin-title">Dashboard</h1>
-    <hr class="gold-rule" />
+    <h1 class="display-font admin-title">
+      Dashboard
+    </h1>
+    <hr class="gold-rule">
 
     <!-- Stat cards -->
     <div class="stat-grid">
-      <div class="stat-card" v-for="s in statCards" :key="s.label">
-        <div class="stat-value">{{ s.value }}</div>
-        <div class="stat-label text-muted">{{ s.label }}</div>
-        <RouterLink v-if="s.link" :to="s.link" class="stat-link">Manage →</RouterLink>
+      <div
+        v-for="s in statCards"
+        :key="s.label"
+        class="stat-card"
+      >
+        <div class="stat-value">
+          {{ s.value }}
+        </div>
+        <div class="stat-label text-muted">
+          {{ s.label }}
+        </div>
+        <RouterLink
+          v-if="s.link"
+          :to="s.link"
+          class="stat-link"
+        >
+          Manage →
+        </RouterLink>
       </div>
     </div>
 
     <!-- Pending actions -->
-    <div class="pending-section" v-if="pending.users || pending.submissions">
-      <h2 class="section-label">Needs Your Attention</h2>
-      <hr class="gold-rule" />
+    <div
+      v-if="pending.users || pending.submissions"
+      class="pending-section"
+    >
+      <h2 class="section-label">
+        Needs Your Attention
+      </h2>
+      <hr class="gold-rule">
       <div class="pending-cards">
-        <RouterLink to="/admin/users" class="pending-card card" v-if="pending.users">
-          <div class="pending-count text-gold">{{ pending.users }}</div>
-          <div class="pending-label">Pending User{{ pending.users > 1 ? 's' : '' }}</div>
+        <RouterLink
+          v-if="pending.users"
+          to="/admin/users"
+          class="pending-card card"
+        >
+          <div class="pending-count text-gold">
+            {{ pending.users }}
+          </div>
+          <div class="pending-label">
+            Pending User{{ pending.users > 1 ? 's' : '' }}
+          </div>
         </RouterLink>
-        <RouterLink to="/admin/submissions" class="pending-card card" v-if="pending.submissions">
-          <div class="pending-count text-gold">{{ pending.submissions }}</div>
-          <div class="pending-label">Pending Submission{{ pending.submissions > 1 ? 's' : '' }}</div>
+        <RouterLink
+          v-if="pending.submissions"
+          to="/admin/submissions"
+          class="pending-card card"
+        >
+          <div class="pending-count text-gold">
+            {{ pending.submissions }}
+          </div>
+          <div class="pending-label">
+            Pending Submission{{ pending.submissions > 1 ? 's' : '' }}
+          </div>
         </RouterLink>
       </div>
     </div>
 
     <!-- Recent activity -->
     <div class="activity-section">
-      <h2 class="section-label">Recent Activity</h2>
-      <hr class="gold-rule" />
+      <h2 class="section-label">
+        Recent Activity
+      </h2>
+      <hr class="gold-rule">
       <div class="activity-list">
-        <div v-for="a in activity" :key="a.id" class="activity-item">
+        <div
+          v-for="a in activity"
+          :key="a.id"
+          class="activity-item"
+        >
           <span class="activity-icon">{{ a.icon }}</span>
           <span class="activity-text">{{ a.text }}</span>
           <span class="activity-time text-muted">{{ a.time }}</span>
@@ -67,7 +110,7 @@ onMounted(async () => {
     ]
     const actRes = await api.get('/admin/activity')
     activity.value = actRes.data
-  } catch {}
+  } catch { /* ignored */ }
 })
 </script>
 

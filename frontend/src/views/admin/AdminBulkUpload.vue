@@ -1,48 +1,88 @@
 <template>
   <div class="admin-bulk">
-    <h1 class="display-font admin-title">Bulk Upload</h1>
-    <p class="text-muted admin-sub">Upload many files at once to quickly populate the archive.</p>
-    <hr class="gold-rule" />
+    <h1 class="display-font admin-title">
+      Bulk Upload
+    </h1>
+    <p class="text-muted admin-sub">
+      Upload many files at once to quickly populate the archive.
+    </p>
+    <hr class="gold-rule">
 
     <!-- Success summary -->
-    <div v-if="result" class="result-card card">
-      <div class="result-icon">✓</div>
+    <div
+      v-if="result"
+      class="result-card card"
+    >
+      <div class="result-icon">
+        ✓
+      </div>
       <h3>Upload Complete</h3>
-      <p class="text-muted">{{ result.uploaded }} file(s) uploaded successfully.</p>
-      <button class="btn btn-primary" @click="reset">Upload More</button>
+      <p class="text-muted">
+        {{ result.uploaded }} file(s) uploaded successfully.
+      </p>
+      <button
+        class="btn btn-primary"
+        @click="reset"
+      >
+        Upload More
+      </button>
     </div>
 
     <!-- Upload form -->
-    <form v-else @submit.prevent="handleUpload" class="upload-form">
+    <form
+      v-else
+      class="upload-form"
+      @submit.prevent="handleUpload"
+    >
       <!-- Content type -->
       <div class="form-row">
         <div class="form-group">
           <label>Content Type</label>
-          <select v-model="form.contentType" required>
-            <option value="">Select type...</option>
-            <option value="photo">Photos &amp; Videos</option>
-            <option value="document">Documents</option>
+          <select
+            v-model="form.contentType"
+            required
+          >
+            <option value="">
+              Select type...
+            </option>
+            <option value="photo">
+              Photos &amp; Videos
+            </option>
+            <option value="document">
+              Documents
+            </option>
           </select>
         </div>
       </div>
 
       <!-- Shared metadata -->
-      <div class="form-row" v-if="form.contentType === 'photo' || form.contentType === 'video'">
+      <div
+        v-if="form.contentType === 'photo' || form.contentType === 'video'"
+        class="form-row"
+      >
         <div class="form-group flex-2">
           <label>Album</label>
-          <div class="combo-box" :class="{ open: showAlbumDropdown }">
+          <div
+            class="combo-box"
+            :class="{ open: showAlbumDropdown }"
+          >
             <input
               v-model="albumSearch"
               type="text"
               placeholder="Type to create new or select existing..."
+              autocomplete="off"
               @focus="showAlbumDropdown = true"
               @input="onAlbumInput"
-              autocomplete="off"
-            />
-            <div v-if="showAlbumDropdown && (filteredAlbums.length || albumSearch)" class="combo-dropdown">
-              <div v-if="albumSearch && !exactMatch"
+            >
+            <div
+              v-if="showAlbumDropdown && (filteredAlbums.length || albumSearch)"
+              class="combo-dropdown"
+            >
+              <div
+                v-if="albumSearch && !exactMatch"
                 class="combo-option combo-new"
-                @mousedown.prevent="selectNewAlbum">
+                @mousedown.prevent="selectNewAlbum"
+              >
                 <span class="combo-new-icon">＋</span>
                 Create new album: <strong>"{{ albumSearch }}"</strong>
               </div>
@@ -51,71 +91,125 @@
                 :key="a.id"
                 class="combo-option"
                 :class="{ selected: selectedAlbumId === a.id }"
-                @mousedown.prevent="selectExistingAlbum(a)">
+                @mousedown.prevent="selectExistingAlbum(a)"
+              >
                 <span class="combo-title">{{ a.title }}</span>
                 <span class="combo-meta text-muted">{{ a.itemCount }} items · {{ a.dateDisplay || 'No date' }}</span>
               </div>
-              <div v-if="!filteredAlbums.length && !albumSearch" class="combo-empty text-muted">
+              <div
+                v-if="!filteredAlbums.length && !albumSearch"
+                class="combo-empty text-muted"
+              >
                 No albums yet — type a name to create one
               </div>
             </div>
           </div>
-          <div v-if="selectedAlbumId" class="combo-selected-tag">
+          <div
+            v-if="selectedAlbumId"
+            class="combo-selected-tag"
+          >
             Adding to: <strong>{{ albumSearch }}</strong>
-            <button type="button" class="combo-clear" @click="clearAlbumSelection">✕</button>
+            <button
+              type="button"
+              class="combo-clear"
+              @click="clearAlbumSelection"
+            >
+              ✕
+            </button>
           </div>
         </div>
         <div class="form-group">
           <label>Date / Era</label>
-          <input v-model="form.date" type="text" placeholder="e.g. Summer 1985, 1940s" />
+          <input
+            v-model="form.date"
+            type="text"
+            placeholder="e.g. Summer 1985, 1940s"
+          >
         </div>
       </div>
 
-      <div class="form-row" v-if="form.contentType === 'document'">
+      <div
+        v-if="form.contentType === 'document'"
+        class="form-row"
+      >
         <div class="form-group flex-2">
           <label>Title (leave blank to use file names)</label>
-          <input v-model="form.title" type="text" placeholder="e.g. Family Letters" />
+          <input
+            v-model="form.title"
+            type="text"
+            placeholder="e.g. Family Letters"
+          >
         </div>
         <div class="form-group">
           <label>Date / Era</label>
-          <input v-model="form.date" type="text" placeholder="e.g. Summer 1985, 1940s" />
+          <input
+            v-model="form.date"
+            type="text"
+            placeholder="e.g. Summer 1985, 1940s"
+          >
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group flex-2">
           <label>Description</label>
-          <textarea v-model="form.description" rows="2" placeholder="Optional description for the batch" />
+          <textarea
+            v-model="form.description"
+            rows="2"
+            placeholder="Optional description for the batch"
+          />
         </div>
         <div class="form-group">
           <label>Location</label>
-          <input v-model="form.location" type="text" placeholder="e.g. Grandma's house" />
+          <input
+            v-model="form.location"
+            type="text"
+            placeholder="e.g. Grandma's house"
+          >
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Source</label>
-          <input v-model="form.source" type="text" placeholder="e.g. Uncle Bob's attic" />
+          <input
+            v-model="form.source"
+            type="text"
+            placeholder="e.g. Uncle Bob's attic"
+          >
         </div>
         <div class="form-group">
           <label>Tags</label>
-          <input v-model="form.tags" type="text" placeholder="e.g. reunion, birthday" />
+          <input
+            v-model="form.tags"
+            type="text"
+            placeholder="e.g. reunion, birthday"
+          >
         </div>
       </div>
 
       <!-- File drop zone -->
       <div class="form-group">
         <label>Files ({{ files.length }} selected)</label>
-        <div class="drop-zone"
+        <div
+          class="drop-zone"
           :class="{ dragover }"
           @dragover.prevent="dragover = true"
           @dragleave="dragover = false"
           @drop.prevent="onDrop"
-          @click="$refs.fileInput.click()">
-          <input ref="fileInput" type="file" multiple @change="onFileChange" class="hidden-input" />
+          @click="$refs.fileInput.click()"
+        >
+          <input
+            ref="fileInput"
+            type="file"
+            multiple
+            class="hidden-input"
+            @change="onFileChange"
+          >
           <div class="drop-content">
-            <div class="drop-icon">📁</div>
+            <div class="drop-icon">
+              📁
+            </div>
             <p>Drag &amp; drop files here, or <span class="drop-link">click to browse</span></p>
             <p class="text-muted drop-hint">
               {{ form.contentType === 'document' ? 'PDFs, images, scans' : 'Images and videos' }}
@@ -126,12 +220,25 @@
       </div>
 
       <!-- File list preview -->
-      <div v-if="files.length" class="file-list">
-        <div v-for="(f, i) in files" :key="i" class="file-item">
+      <div
+        v-if="files.length"
+        class="file-list"
+      >
+        <div
+          v-for="(f, i) in files"
+          :key="i"
+          class="file-item"
+        >
           <span class="file-icon">{{ f.type.startsWith('image/') ? '🖼️' : f.type.startsWith('video/') ? '🎬' : '📄' }}</span>
           <span class="file-name">{{ f.name }}</span>
           <span class="file-size text-muted">{{ formatSize(f.size) }}</span>
-          <button type="button" class="file-remove" @click="removeFile(i)">✕</button>
+          <button
+            type="button"
+            class="file-remove"
+            @click="removeFile(i)"
+          >
+            ✕
+          </button>
         </div>
         <div class="file-summary text-muted">
           {{ files.length }} files · {{ formatSize(totalSize) }} total
@@ -139,17 +246,32 @@
       </div>
 
       <!-- Progress bar -->
-      <div v-if="uploading" class="progress-bar">
-        <div class="progress-fill" :style="{ width: progress + '%' }"></div>
+      <div
+        v-if="uploading"
+        class="progress-bar"
+      >
+        <div
+          class="progress-fill"
+          :style="{ width: progress + '%' }"
+        />
         <span class="progress-text">{{ Math.round(progress) }}%</span>
       </div>
 
       <!-- Error -->
-      <div v-if="error" class="error-msg">{{ error }}</div>
+      <div
+        v-if="error"
+        class="error-msg"
+      >
+        {{ error }}
+      </div>
 
       <!-- Submit -->
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" :disabled="uploading || !files.length || !form.contentType">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="uploading || !files.length || !form.contentType"
+        >
           {{ uploading ? 'Uploading...' : `Upload ${files.length} File${files.length !== 1 ? 's' : ''}` }}
         </button>
       </div>
@@ -194,7 +316,7 @@ async function loadAlbums() {
   try {
     const { data } = await api.get('/media/albums')
     albums.value = (data.albums || data || [])
-  } catch {}
+  } catch { /* ignored */ }
 }
 
 function onAlbumInput() {

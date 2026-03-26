@@ -1,7 +1,9 @@
 <template>
   <div class="admin-donations">
-    <h1 class="display-font admin-title">Donations</h1>
-    <hr class="gold-rule" />
+    <h1 class="display-font admin-title">
+      Donations
+    </h1>
+    <hr class="gold-rule">
 
     <div class="stat-bar">
       <div class="stat-item">
@@ -26,16 +28,30 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="d in donations" :key="d.id">
+          <tr
+            v-for="d in donations"
+            :key="d.id"
+          >
             <td>{{ d.donorName || 'Anonymous' }}</td>
-            <td class="text-gold">${{ d.amount.toFixed(2) }}</td>
-            <td class="text-muted">{{ d.donorMessage || '—' }}</td>
+            <td class="text-gold">
+              ${{ d.amount.toFixed(2) }}
+            </td>
+            <td class="text-muted">
+              {{ d.donorMessage || '—' }}
+            </td>
             <td>{{ d.isPublic ? 'Yes' : 'No' }}</td>
-            <td class="text-muted">{{ formatDate(d.createdAt) }}</td>
+            <td class="text-muted">
+              {{ formatDate(d.createdAt) }}
+            </td>
           </tr>
         </tbody>
       </table>
-      <div v-if="!donations.length" class="empty text-muted">No donations yet.</div>
+      <div
+        v-if="!donations.length"
+        class="empty text-muted"
+      >
+        No donations yet.
+      </div>
     </div>
   </div>
 </template>
@@ -59,7 +75,7 @@ onMounted(async () => {
     donations.value = data.donations || []
     total.value     = data.total || 0
     count.value     = data.count || 0
-  } catch {}
+  } catch { /* ignored */ }
 })
 </script>
 

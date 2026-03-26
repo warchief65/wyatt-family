@@ -1,31 +1,90 @@
 <template>
   <div class="stories-page">
     <div class="page-header">
-      <h1 class="display-font page-title">Stories</h1>
-      <hr class="gold-rule" />
+      <h1 class="display-font page-title">
+        Stories
+      </h1>
+      <hr class="gold-rule">
     </div>
 
     <div class="filters">
-      <input v-model="filters.q" placeholder="Search stories..." @input="load" class="filter-input" />
-      <select v-model="filters.topic" @change="load">
-        <option value="">All Topics</option>
-        <option v-for="t in topics" :key="t" :value="t">{{ t }}</option>
+      <input
+        v-model="filters.q"
+        placeholder="Search stories..."
+        class="filter-input"
+        @input="load"
+      >
+      <select
+        v-model="filters.topic"
+        @change="load"
+      >
+        <option value="">
+          All Topics
+        </option>
+        <option
+          v-for="t in topics"
+          :key="t"
+          :value="t"
+        >
+          {{ t }}
+        </option>
       </select>
     </div>
 
     <div class="stories-content">
-      <div v-if="loading" class="loading text-muted">Loading...</div>
-      <div v-else-if="!stories.length" class="empty text-muted">No stories found.</div>
-      <div v-else class="stories-grid">
-        <RouterLink v-for="s in stories" :key="s.id" :to="`/stories/${s.id}`" class="story-card card">
+      <div
+        v-if="loading"
+        class="loading text-muted"
+      >
+        Loading...
+      </div>
+      <div
+        v-else-if="!stories.length"
+        class="empty text-muted"
+      >
+        No stories found.
+      </div>
+      <div
+        v-else
+        class="stories-grid"
+      >
+        <RouterLink
+          v-for="s in stories"
+          :key="s.id"
+          :to="`/stories/${s.id}`"
+          class="story-card card"
+        >
           <div class="story-header">
-            <span v-if="s.topic" class="badge">{{ s.topic }}</span>
-            <span v-if="s.isPrivate" class="badge badge-private">Private</span>
+            <span
+              v-if="s.topic"
+              class="badge"
+            >{{ s.topic }}</span>
+            <span
+              v-if="s.isPrivate"
+              class="badge badge-private"
+            >Private</span>
           </div>
-          <h2 class="story-title">{{ s.title }}</h2>
-          <p v-if="s.dateDisplay" class="story-meta text-muted">{{ s.dateDisplay }}</p>
-          <p v-if="s.people?.length" class="story-people text-muted">{{ s.people.join(', ') }}</p>
-          <p v-if="s.excerpt" class="story-excerpt text-muted">{{ s.excerpt }}</p>
+          <h2 class="story-title">
+            {{ s.title }}
+          </h2>
+          <p
+            v-if="s.dateDisplay"
+            class="story-meta text-muted"
+          >
+            {{ s.dateDisplay }}
+          </p>
+          <p
+            v-if="s.people?.length"
+            class="story-people text-muted"
+          >
+            {{ s.people.join(', ') }}
+          </p>
+          <p
+            v-if="s.excerpt"
+            class="story-excerpt text-muted"
+          >
+            {{ s.excerpt }}
+          </p>
           <span class="read-more">Read story →</span>
         </RouterLink>
       </div>

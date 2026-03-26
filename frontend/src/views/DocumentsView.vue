@@ -1,52 +1,124 @@
 <template>
   <div class="documents-page">
     <div class="page-header">
-      <h1 class="display-font page-title">Documents &amp; Artifacts</h1>
-      <hr class="gold-rule" />
+      <h1 class="display-font page-title">
+        Documents &amp; Artifacts
+      </h1>
+      <hr class="gold-rule">
     </div>
 
     <div class="filters">
-      <input v-model="filters.q" placeholder="Search documents..." @input="load" class="filter-input" />
-      <select v-model="filters.type" @change="load">
-        <option value="">All Types</option>
-        <option v-for="t in docTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
+      <input
+        v-model="filters.q"
+        placeholder="Search documents..."
+        class="filter-input"
+        @input="load"
+      >
+      <select
+        v-model="filters.type"
+        @change="load"
+      >
+        <option value="">
+          All Types
+        </option>
+        <option
+          v-for="t in docTypes"
+          :key="t.value"
+          :value="t.value"
+        >
+          {{ t.label }}
+        </option>
       </select>
     </div>
 
     <div class="docs-content">
-      <div v-if="loading" class="loading text-muted">Loading...</div>
-      <div v-else-if="!documents.length" class="empty text-muted">No documents found.</div>
-      <div v-else class="docs-list">
-        <div v-for="d in documents" :key="d.id" class="doc-card card" @click="openDoc(d)">
-          <div class="doc-icon">{{ typeIcon(d.type) }}</div>
+      <div
+        v-if="loading"
+        class="loading text-muted"
+      >
+        Loading...
+      </div>
+      <div
+        v-else-if="!documents.length"
+        class="empty text-muted"
+      >
+        No documents found.
+      </div>
+      <div
+        v-else
+        class="docs-list"
+      >
+        <div
+          v-for="d in documents"
+          :key="d.id"
+          class="doc-card card"
+          @click="openDoc(d)"
+        >
+          <div class="doc-icon">
+            {{ typeIcon(d.type) }}
+          </div>
           <div class="doc-info">
-            <div class="doc-title">{{ d.title }}</div>
+            <div class="doc-title">
+              {{ d.title }}
+            </div>
             <div class="doc-meta text-muted">
               {{ d.type }}
               <span v-if="d.dateDisplay"> · {{ d.dateDisplay }}</span>
               <span v-if="d.location"> · {{ d.location }}</span>
             </div>
-            <div v-if="d.description" class="doc-desc text-muted">{{ d.description }}</div>
-            <div v-if="d.people?.length" class="doc-people">
-              <span v-for="p in d.people" :key="p" class="badge">{{ p }}</span>
+            <div
+              v-if="d.description"
+              class="doc-desc text-muted"
+            >
+              {{ d.description }}
+            </div>
+            <div
+              v-if="d.people?.length"
+              class="doc-people"
+            >
+              <span
+                v-for="p in d.people"
+                :key="p"
+                class="badge"
+              >{{ p }}</span>
             </div>
           </div>
-          <span v-if="d.isPrivate" class="doc-lock">🔒</span>
+          <span
+            v-if="d.isPrivate"
+            class="doc-lock"
+          >🔒</span>
         </div>
       </div>
     </div>
 
     <!-- Document viewer modal -->
     <Teleport to="body">
-      <div v-if="activeDoc" class="doc-modal" @click.self="activeDoc = null">
+      <div
+        v-if="activeDoc"
+        class="doc-modal"
+        @click.self="activeDoc = null"
+      >
         <div class="doc-viewer">
           <div class="viewer-header">
             <h3>{{ activeDoc.title }}</h3>
-            <button @click="activeDoc = null" class="close-btn">✕</button>
+            <button
+              class="close-btn"
+              @click="activeDoc = null"
+            >
+              ✕
+            </button>
           </div>
-          <iframe v-if="activeDoc.url?.endsWith('.pdf') || activeDoc.type === 'pdf'"
-            :src="activeDoc.url" class="pdf-viewer" />
-          <img v-else :src="activeDoc.url" :alt="activeDoc.title" class="img-viewer" />
+          <iframe
+            v-if="activeDoc.url?.endsWith('.pdf') || activeDoc.type === 'pdf'"
+            :src="activeDoc.url"
+            class="pdf-viewer"
+          />
+          <img
+            v-else
+            :src="activeDoc.url"
+            :alt="activeDoc.title"
+            class="img-viewer"
+          >
           <div class="viewer-meta text-muted">
             <span v-if="activeDoc.dateDisplay">{{ activeDoc.dateDisplay }}</span>
             <span v-if="activeDoc.location"> · {{ activeDoc.location }}</span>

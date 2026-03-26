@@ -1,14 +1,25 @@
 <template>
   <div class="comment-section">
-    <h3 class="section-label">Comments</h3>
-    <hr class="gold-rule" />
+    <h3 class="section-label">
+      Comments
+    </h3>
+    <hr class="gold-rule">
 
     <!-- Post comment -->
     <div class="post-comment">
-      <textarea v-model="newComment" rows="3" placeholder="Leave a comment..." maxlength="1000" />
+      <textarea
+        v-model="newComment"
+        rows="3"
+        placeholder="Leave a comment..."
+        maxlength="1000"
+      />
       <div class="post-actions">
         <span class="char-count text-muted">{{ newComment.length }}/1000</span>
-        <button class="btn btn-primary btn-sm" @click="postComment" :disabled="!newComment.trim() || posting">
+        <button
+          class="btn btn-primary btn-sm"
+          :disabled="!newComment.trim() || posting"
+          @click="postComment"
+        >
           {{ posting ? 'Posting...' : 'Post Comment' }}
         </button>
       </div>
@@ -16,22 +27,64 @@
 
     <!-- Comment list -->
     <div class="comment-list">
-      <div v-if="!comments.length" class="no-comments text-muted">No comments yet. Be the first!</div>
-      <div v-for="c in comments" :key="c.id" class="comment-item">
+      <div
+        v-if="!comments.length"
+        class="no-comments text-muted"
+      >
+        No comments yet. Be the first!
+      </div>
+      <div
+        v-for="c in comments"
+        :key="c.id"
+        class="comment-item"
+      >
         <div class="comment-header">
           <span class="comment-author">{{ c.authorName }}</span>
           <span class="comment-date text-muted">{{ formatDate(c.createdAt) }}</span>
           <div class="comment-actions">
-            <button v-if="canEdit(c)" class="btn-link" @click="startEdit(c)">Edit</button>
-            <button v-if="canDelete(c)" class="btn-link danger" @click="deleteComment(c.id)">Delete</button>
+            <button
+              v-if="canEdit(c)"
+              class="btn-link"
+              @click="startEdit(c)"
+            >
+              Edit
+            </button>
+            <button
+              v-if="canDelete(c)"
+              class="btn-link danger"
+              @click="deleteComment(c.id)"
+            >
+              Delete
+            </button>
           </div>
         </div>
-        <div v-if="editingId !== c.id" class="comment-body">{{ c.text }}</div>
-        <div v-else class="edit-form">
-          <textarea v-model="editText" rows="2" />
+        <div
+          v-if="editingId !== c.id"
+          class="comment-body"
+        >
+          {{ c.text }}
+        </div>
+        <div
+          v-else
+          class="edit-form"
+        >
+          <textarea
+            v-model="editText"
+            rows="2"
+          />
           <div class="post-actions">
-            <button class="btn btn-primary btn-sm" @click="saveEdit(c.id)">Save</button>
-            <button class="btn btn-ghost btn-sm" @click="editingId = null">Cancel</button>
+            <button
+              class="btn btn-primary btn-sm"
+              @click="saveEdit(c.id)"
+            >
+              Save
+            </button>
+            <button
+              class="btn btn-ghost btn-sm"
+              @click="editingId = null"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>

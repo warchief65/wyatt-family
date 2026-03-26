@@ -1,29 +1,56 @@
 <template>
   <div class="auth-page">
     <div class="auth-card card">
-      <img src="/crest.png" alt="Wyatt Crest" class="auth-crest" />
-      <h2 class="display-font auth-title">Sign In</h2>
-      <hr class="gold-rule" />
+      <img
+        src="/crest.png"
+        alt="Wyatt Crest"
+        class="auth-crest"
+      >
+      <h2 class="display-font auth-title">
+        Sign In
+      </h2>
+      <hr class="gold-rule">
 
       <form @submit.prevent="handleLogin">
         <div class="form-group">
           <label>Email Address</label>
-          <input v-model="form.email" type="email" required placeholder="you@example.com" />
+          <input
+            v-model="form.email"
+            type="email"
+            required
+            placeholder="you@example.com"
+          >
         </div>
         <div class="form-group">
           <label>Password</label>
-          <input v-model="form.password" type="password" required placeholder="••••••••" />
+          <input
+            v-model="form.password"
+            type="password"
+            required
+            placeholder="••••••••"
+          >
         </div>
 
-        <p v-if="error" class="error-msg">{{ error }}</p>
+        <p
+          v-if="error"
+          class="error-msg"
+        >
+          {{ error }}
+        </p>
 
-        <button class="btn btn-primary full-width" type="submit" :disabled="loading">
+        <button
+          class="btn btn-primary full-width"
+          type="submit"
+          :disabled="loading"
+        >
           {{ loading ? 'Signing in...' : 'Sign In' }}
         </button>
       </form>
 
       <div class="auth-links">
-        <RouterLink to="/register">Don't have an account? Join the family →</RouterLink>
+        <RouterLink to="/register">
+          Don't have an account? Join the family →
+        </RouterLink>
       </div>
     </div>
   </div>

@@ -3,27 +3,52 @@
     <!-- Hero -->
     <section class="hero">
       <div class="crest-wrapper">
-        <img src="/crest.png" alt="Wyatt Coat of Arms" class="hero-crest" />
-        <span class="sparkle s1"></span>
-        <span class="sparkle s2"></span>
-        <span class="sparkle s3"></span>
-        <span class="sparkle s4"></span>
-        <span class="sparkle s5"></span>
-        <span class="sparkle s6"></span>
+        <img
+          src="/crest.png"
+          alt="Wyatt Coat of Arms"
+          class="hero-crest"
+        >
+        <span class="sparkle s1" />
+        <span class="sparkle s2" />
+        <span class="sparkle s3" />
+        <span class="sparkle s4" />
+        <span class="sparkle s5" />
+        <span class="sparkle s6" />
       </div>
-      <h1 class="hero-title display-font">Wyatt Family</h1>
-      <hr class="gold-rule hero-rule" />
-      <p class="hero-tagline">Preserving Our History &nbsp;·&nbsp; Sharing Our Stories &nbsp;·&nbsp; alanwyatt.com</p>
+      <h1 class="hero-title display-font">
+        Wyatt Family
+      </h1>
+      <hr class="gold-rule hero-rule">
+      <p class="hero-tagline">
+        Preserving Our History &nbsp;·&nbsp; Sharing Our Stories &nbsp;·&nbsp; alanwyatt.com
+      </p>
 
       <div class="hero-search">
-        <input v-model="query" placeholder="Search people, photos, stories, documents..." @keyup.enter="doSearch" />
-        <button class="btn btn-primary" @click="doSearch">Search</button>
+        <input
+          v-model="query"
+          placeholder="Search people, photos, stories, documents..."
+          @keyup.enter="doSearch"
+        >
+        <button
+          class="btn btn-primary"
+          @click="doSearch"
+        >
+          Search
+        </button>
       </div>
 
       <div class="hero-stats">
-        <div class="stat" v-for="s in stats" :key="s.label">
-          <div class="stat-num">{{ s.value.toLocaleString() }}</div>
-          <div class="stat-label">{{ s.label }}</div>
+        <div
+          v-for="s in stats"
+          :key="s.label"
+          class="stat"
+        >
+          <div class="stat-num">
+            {{ s.value.toLocaleString() }}
+          </div>
+          <div class="stat-label">
+            {{ s.label }}
+          </div>
         </div>
       </div>
     </section>
@@ -31,8 +56,15 @@
     <!-- Recent bar -->
     <div class="recent-bar">
       <span class="section-label">Recently Added</span>
-      <span v-for="r in recent" :key="r.id" class="recent-item">
-        <RouterLink :to="r.link" class="text-gold">{{ r.title }}</RouterLink>
+      <span
+        v-for="r in recent"
+        :key="r.id"
+        class="recent-item"
+      >
+        <RouterLink
+          :to="r.link"
+          class="text-gold"
+        >{{ r.title }}</RouterLink>
         <span class="text-muted"> · {{ r.type }}</span>
       </span>
     </div>
@@ -42,7 +74,12 @@
       <section class="home-section">
         <div class="section-header">
           <span class="section-label">Recent Photos &amp; Videos</span>
-          <RouterLink to="/photos" class="view-all">View all →</RouterLink>
+          <RouterLink
+            to="/photos"
+            class="view-all"
+          >
+            View all →
+          </RouterLink>
         </div>
         <PhotoGrid :items="recentMedia" />
       </section>
@@ -52,15 +89,30 @@
         <section class="home-section">
           <div class="section-header">
             <span class="section-label">Latest Stories</span>
-            <RouterLink to="/stories" class="view-all">View all →</RouterLink>
+            <RouterLink
+              to="/stories"
+              class="view-all"
+            >
+              View all →
+            </RouterLink>
           </div>
           <div class="story-list">
-            <div v-for="s in recentStories" :key="s.id" class="story-card card">
+            <div
+              v-for="s in recentStories"
+              :key="s.id"
+              class="story-card card"
+            >
               <RouterLink :to="`/stories/${s.id}`">
                 <span class="badge story-tag">{{ s.topic }}</span>
-                <h3 class="story-title">{{ s.title }}</h3>
-                <p class="text-muted story-meta">{{ s.dateDisplay }} · {{ s.people?.join(', ') }}</p>
-                <p class="story-excerpt text-muted">{{ s.excerpt }}</p>
+                <h3 class="story-title">
+                  {{ s.title }}
+                </h3>
+                <p class="text-muted story-meta">
+                  {{ s.dateDisplay }} · {{ s.people?.join(', ') }}
+                </p>
+                <p class="story-excerpt text-muted">
+                  {{ s.excerpt }}
+                </p>
               </RouterLink>
             </div>
           </div>
@@ -70,14 +122,30 @@
         <section class="home-section">
           <div class="section-header">
             <span class="section-label">Recent Documents</span>
-            <RouterLink to="/documents" class="view-all">View all →</RouterLink>
+            <RouterLink
+              to="/documents"
+              class="view-all"
+            >
+              View all →
+            </RouterLink>
           </div>
           <div class="doc-list">
-            <RouterLink v-for="d in recentDocs" :key="d.id" :to="`/documents?id=${d.id}`" class="doc-item card">
-              <div class="doc-icon">{{ docIcon(d.type) }}</div>
+            <RouterLink
+              v-for="d in recentDocs"
+              :key="d.id"
+              :to="`/documents?id=${d.id}`"
+              class="doc-item card"
+            >
+              <div class="doc-icon">
+                {{ docIcon(d.type) }}
+              </div>
               <div>
-                <div class="doc-name">{{ d.title }}</div>
-                <div class="doc-type text-muted">{{ d.type }} · {{ d.dateDisplay }}</div>
+                <div class="doc-name">
+                  {{ d.title }}
+                </div>
+                <div class="doc-type text-muted">
+                  {{ d.type }} · {{ d.dateDisplay }}
+                </div>
               </div>
             </RouterLink>
           </div>

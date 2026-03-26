@@ -1,9 +1,22 @@
 <template>
   <div class="not-found">
-    <img src="/crest.png" alt="Wyatt Crest" class="nf-crest" />
-    <h1 class="display-font nf-title">Page Not Found</h1>
-    <p class="text-muted">The page you're looking for doesn't exist or has been moved.</p>
-    <RouterLink to="/" class="btn btn-secondary mt-2">Return Home</RouterLink>
+    <img
+      src="/crest.png"
+      alt="Wyatt Crest"
+      class="nf-crest"
+    >
+    <h1 class="display-font nf-title">
+      Page Not Found
+    </h1>
+    <p class="text-muted">
+      The page you're looking for doesn't exist or has been moved.
+    </p>
+    <RouterLink
+      to="/"
+      class="btn btn-secondary mt-2"
+    >
+      Return Home
+    </RouterLink>
   </div>
 </template>
 

@@ -1,22 +1,49 @@
 <template>
   <div class="thanks-page">
     <div class="page-header">
-      <img src="/crest.png" alt="Wyatt Crest" class="thanks-crest" />
-      <h1 class="display-font page-title">Thank You</h1>
-      <hr class="gold-rule" />
+      <img
+        src="/crest.png"
+        alt="Wyatt Crest"
+        class="thanks-crest"
+      >
+      <h1 class="display-font page-title">
+        Thank You
+      </h1>
+      <hr class="gold-rule">
       <p class="text-muted thanks-sub">
         Your generosity helps keep the Wyatt family archive alive and growing. We're grateful for every contribution.
       </p>
-      <RouterLink to="/" class="btn btn-secondary mt-2">Return Home</RouterLink>
+      <RouterLink
+        to="/"
+        class="btn btn-secondary mt-2"
+      >
+        Return Home
+      </RouterLink>
     </div>
 
-    <div class="donors-section" v-if="donors.length">
-      <h3 class="section-label">Our Supporters</h3>
-      <hr class="gold-rule" />
+    <div
+      v-if="donors.length"
+      class="donors-section"
+    >
+      <h3 class="section-label">
+        Our Supporters
+      </h3>
+      <hr class="gold-rule">
       <div class="donors-list">
-        <div v-for="d in donors" :key="d.donorName + d.createdAt" class="donor-item">
-          <div class="donor-name text-gold">{{ d.donorName }}</div>
-          <div v-if="d.donorMessage" class="donor-msg text-muted">"{{ d.donorMessage }}"</div>
+        <div
+          v-for="d in donors"
+          :key="d.donorName + d.createdAt"
+          class="donor-item"
+        >
+          <div class="donor-name text-gold">
+            {{ d.donorName }}
+          </div>
+          <div
+            v-if="d.donorMessage"
+            class="donor-msg text-muted"
+          >
+            "{{ d.donorMessage }}"
+          </div>
         </div>
       </div>
     </div>
@@ -33,7 +60,7 @@ onMounted(async () => {
   try {
     const { data } = await api.get('/donations/public')
     donors.value = data
-  } catch {}
+  } catch { /* ignored */ }
 })
 </script>
 

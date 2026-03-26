@@ -2,12 +2,25 @@
   <div class="photo-grid-wrapper">
     <!-- View toggle -->
     <div class="view-toggle">
-      <button :class="['btn btn-ghost btn-sm', mode === 'grid' && 'active']" @click="mode = 'grid'">Grid</button>
-      <button :class="['btn btn-ghost btn-sm', mode === 'slide' && 'active']" @click="startSlideshow">Slideshow</button>
+      <button
+        :class="['btn btn-ghost btn-sm', mode === 'grid' && 'active']"
+        @click="mode = 'grid'"
+      >
+        Grid
+      </button>
+      <button
+        :class="['btn btn-ghost btn-sm', mode === 'slide' && 'active']"
+        @click="startSlideshow"
+      >
+        Slideshow
+      </button>
     </div>
 
     <!-- Grid view -->
-    <div v-if="mode === 'grid'" class="grid">
+    <div
+      v-if="mode === 'grid'"
+      class="grid"
+    >
       <div
         v-for="item in items"
         :key="item.id"
@@ -15,20 +28,45 @@
         @click="openItem(item)"
       >
         <div class="thumb">
-          <img v-if="item.thumbnailUrl" :src="item.thumbnailUrl" :alt="item.title" loading="lazy" />
-          <div v-else class="thumb-placeholder">
+          <img
+            v-if="item.thumbnailUrl"
+            :src="item.thumbnailUrl"
+            :alt="item.title"
+            loading="lazy"
+          >
+          <div
+            v-else
+            class="thumb-placeholder"
+          >
             <span v-if="item.type === 'video'">▶</span>
             <span v-else-if="item.isPrivate">🔒</span>
             <span v-else>📷</span>
           </div>
-          <span v-if="item.type === 'video'" class="video-badge">▶</span>
-          <span v-if="item.isPrivate" class="private-overlay">🔒</span>
+          <span
+            v-if="item.type === 'video'"
+            class="video-badge"
+          >▶</span>
+          <span
+            v-if="item.isPrivate"
+            class="private-overlay"
+          >🔒</span>
         </div>
         <div class="item-meta">
-          <div class="item-title">{{ item.title }}</div>
-          <div class="item-sub text-muted">{{ item.dateDisplay }}</div>
-          <div v-if="item.people?.length" class="item-tags">
-            <span v-for="p in item.people.slice(0,3)" :key="p" class="badge">{{ p }}</span>
+          <div class="item-title">
+            {{ item.title }}
+          </div>
+          <div class="item-sub text-muted">
+            {{ item.dateDisplay }}
+          </div>
+          <div
+            v-if="item.people?.length"
+            class="item-tags"
+          >
+            <span
+              v-for="p in item.people.slice(0,3)"
+              :key="p"
+              class="badge"
+            >{{ p }}</span>
           </div>
         </div>
       </div>
@@ -44,19 +82,57 @@
 
     <!-- Lightbox -->
     <Teleport to="body">
-      <div v-if="lightbox" class="lightbox" @click.self="lightbox = null">
-        <button class="lb-close" @click="lightbox = null">✕</button>
-        <button class="lb-prev" @click="prevItem">‹</button>
-        <button class="lb-next" @click="nextItem">›</button>
+      <div
+        v-if="lightbox"
+        class="lightbox"
+        @click.self="lightbox = null"
+      >
+        <button
+          class="lb-close"
+          @click="lightbox = null"
+        >
+          ✕
+        </button>
+        <button
+          class="lb-prev"
+          @click="prevItem"
+        >
+          ‹
+        </button>
+        <button
+          class="lb-next"
+          @click="nextItem"
+        >
+          ›
+        </button>
 
         <div class="lb-content">
-          <video v-if="lightbox.type === 'video'" :src="lightbox.url" controls class="lb-media" />
-          <img   v-else :src="lightbox.url" :alt="lightbox.title" class="lb-media" />
+          <video
+            v-if="lightbox.type === 'video'"
+            :src="lightbox.url"
+            controls
+            class="lb-media"
+          />
+          <img
+            v-else
+            :src="lightbox.url"
+            :alt="lightbox.title"
+            class="lb-media"
+          >
           <div class="lb-meta">
             <h3>{{ lightbox.title }}</h3>
-            <p class="text-muted">{{ lightbox.dateDisplay }}</p>
-            <p v-if="lightbox.location" class="text-muted">{{ lightbox.location }}</p>
-            <p v-if="lightbox.description">{{ lightbox.description }}</p>
+            <p class="text-muted">
+              {{ lightbox.dateDisplay }}
+            </p>
+            <p
+              v-if="lightbox.location"
+              class="text-muted"
+            >
+              {{ lightbox.location }}
+            </p>
+            <p v-if="lightbox.description">
+              {{ lightbox.description }}
+            </p>
           </div>
         </div>
       </div>

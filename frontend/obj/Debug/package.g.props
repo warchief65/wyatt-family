@@ -13,6 +13,7 @@
     <PackageJsonDependenciesPinia Condition="$(PackageJsonDependenciesPinia) == ''">^2.1.7</PackageJsonDependenciesPinia>
     <PackageJsonDependenciesVue Condition="$(PackageJsonDependenciesVue) == ''">^3.4.21</PackageJsonDependenciesVue>
     <PackageJsonDependenciesVueRouter Condition="$(PackageJsonDependenciesVueRouter) == ''">^4.3.0</PackageJsonDependenciesVueRouter>
+    <PackageJsonDependenciesVue3Carousel Condition="$(PackageJsonDependenciesVue3Carousel) == ''">^0.17.0</PackageJsonDependenciesVue3Carousel>
     <PackageJsonDevdependenciesVitejsPluginVue Condition="$(PackageJsonDevdependenciesVitejsPluginVue) == ''">^5.0.4</PackageJsonDevdependenciesVitejsPluginVue>
     <PackageJsonDevdependenciesEslint Condition="$(PackageJsonDevdependenciesEslint) == ''">^8.57.0</PackageJsonDevdependenciesEslint>
     <PackageJsonDevdependenciesEslintPluginVue Condition="$(PackageJsonDevdependenciesEslintPluginVue) == ''">^9.24.0</PackageJsonDevdependenciesEslintPluginVue>

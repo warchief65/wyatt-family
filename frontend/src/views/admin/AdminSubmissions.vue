@@ -1,21 +1,33 @@
 <template>
   <div class="admin-submissions">
-    <h1 class="display-font admin-title">Content Submissions</h1>
-    <hr class="gold-rule" />
+    <h1 class="display-font admin-title">
+      Content Submissions
+    </h1>
+    <hr class="gold-rule">
 
     <div class="toolbar">
       <div class="filter-tabs">
-        <button v-for="s in statusTabs" :key="s.value"
+        <button
+          v-for="s in statusTabs"
+          :key="s.value"
           :class="['btn btn-ghost btn-sm', filter === s.value && 'active']"
-          @click="filter = s.value; load()">
+          @click="filter = s.value; load()"
+        >
           {{ s.label }}
-          <span v-if="s.count" class="tab-count">{{ s.count }}</span>
+          <span
+            v-if="s.count"
+            class="tab-count"
+          >{{ s.count }}</span>
         </button>
       </div>
     </div>
 
     <div class="submissions-list">
-      <div v-for="s in submissions" :key="s.id" class="submission-card card">
+      <div
+        v-for="s in submissions"
+        :key="s.id"
+        class="submission-card card"
+      >
         <div class="sub-header">
           <div>
             <span :class="`badge badge-${s.status}`">{{ s.status }}</span>
@@ -24,48 +36,118 @@
           <span class="sub-date text-muted">{{ formatDate(s.submittedAt) }}</span>
         </div>
 
-        <h3 class="sub-title">{{ s.title }}</h3>
-        <p class="sub-author text-muted">Submitted by {{ s.submittedBy }}</p>
-        <p v-if="s.description" class="sub-desc text-muted">{{ s.description }}</p>
+        <h3 class="sub-title">
+          {{ s.title }}
+        </h3>
+        <p class="sub-author text-muted">
+          Submitted by {{ s.submittedBy }}
+        </p>
+        <p
+          v-if="s.description"
+          class="sub-desc text-muted"
+        >
+          {{ s.description }}
+        </p>
 
         <!-- File previews -->
-        <div class="sub-files" v-if="s.files?.length">
-          <div v-for="f in s.files" :key="f.url" class="sub-file">
-            <img v-if="f.isImage" :src="f.url" class="file-thumb" />
-            <div v-else class="file-icon">📄</div>
+        <div
+          v-if="s.files?.length"
+          class="sub-files"
+        >
+          <div
+            v-for="f in s.files"
+            :key="f.url"
+            class="sub-file"
+          >
+            <img
+              v-if="f.isImage"
+              :src="f.url"
+              class="file-thumb"
+            >
+            <div
+              v-else
+              class="file-icon"
+            >
+              📄
+            </div>
             <span class="text-muted">{{ f.name }}</span>
           </div>
         </div>
 
         <!-- Metadata -->
-        <div class="sub-meta text-muted" v-if="s.date || s.location || s.people">
+        <div
+          v-if="s.date || s.location || s.people"
+          class="sub-meta text-muted"
+        >
           <span v-if="s.date">📅 {{ s.date }}</span>
           <span v-if="s.location">📍 {{ s.location }}</span>
           <span v-if="s.people">👤 {{ s.people }}</span>
         </div>
 
         <!-- Actions -->
-        <div class="sub-actions" v-if="s.status === 'pending'">
-          <button class="btn btn-primary btn-sm" @click="approve(s)">Approve &amp; Publish</button>
-          <button class="btn btn-danger  btn-sm" @click="openReject(s)">Reject</button>
+        <div
+          v-if="s.status === 'pending'"
+          class="sub-actions"
+        >
+          <button
+            class="btn btn-primary btn-sm"
+            @click="approve(s)"
+          >
+            Approve &amp; Publish
+          </button>
+          <button
+            class="btn btn-danger  btn-sm"
+            @click="openReject(s)"
+          >
+            Reject
+          </button>
         </div>
-        <div v-else-if="s.rejectionReason" class="rejection-reason text-muted">
+        <div
+          v-else-if="s.rejectionReason"
+          class="rejection-reason text-muted"
+        >
           Rejection reason: {{ s.rejectionReason }}
         </div>
       </div>
-      <div v-if="!submissions.length" class="empty text-muted">No submissions found.</div>
+      <div
+        v-if="!submissions.length"
+        class="empty text-muted"
+      >
+        No submissions found.
+      </div>
     </div>
 
     <!-- Reject modal -->
     <Teleport to="body">
-      <div v-if="rejectTarget" class="modal-overlay" @click.self="rejectTarget = null">
+      <div
+        v-if="rejectTarget"
+        class="modal-overlay"
+        @click.self="rejectTarget = null"
+      >
         <div class="modal card">
           <h3>Reject Submission</h3>
-          <p class="text-muted">Optionally provide a reason — it will be emailed to the submitter.</p>
-          <textarea v-model="rejectReason" rows="3" placeholder="Reason (optional)..." class="mt-1" />
+          <p class="text-muted">
+            Optionally provide a reason — it will be emailed to the submitter.
+          </p>
+          <textarea
+            v-model="rejectReason"
+            rows="3"
+            placeholder="Reason (optional)..."
+            class="mt-1"
+          />
           <div class="modal-actions">
-            <button class="btn btn-danger"  @click="confirmReject">Reject Submission</button>
-            <button class="btn btn-ghost"   @click="rejectTarget = null">Cancel</button>
+            <button
+              class="btn btn-danger"
+              @click="confirmReject"
+            >
+              Reject Submission
+            </button>
+            <button
+              class="btn btn-ghost"
+              @click="rejectTarget = null"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>

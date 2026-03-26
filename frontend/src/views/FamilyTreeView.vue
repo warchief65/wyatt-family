@@ -1,43 +1,100 @@
 <template>
   <div class="tree-page">
     <div class="page-header">
-      <h1 class="display-font page-title">Family Tree</h1>
-      <p class="text-muted page-sub">The Wyatt family lineage from Kent, England to America</p>
-      <hr class="gold-rule" />
+      <h1 class="display-font page-title">
+        Family Tree
+      </h1>
+      <p class="text-muted page-sub">
+        The Wyatt family lineage from Kent, England to America
+      </p>
+      <hr class="gold-rule">
     </div>
 
     <div class="tree-toolbar">
-      <input v-model="search" placeholder="Search family members..." class="search-input" @input="filterPeople" />
+      <input
+        v-model="search"
+        placeholder="Search family members..."
+        class="search-input"
+        @input="filterPeople"
+      >
       <div class="tree-controls">
-        <button class="btn btn-ghost btn-sm" @click="zoom(0.1)">＋ Zoom</button>
-        <button class="btn btn-ghost btn-sm" @click="zoom(-0.1)">－ Zoom</button>
-        <button class="btn btn-ghost btn-sm" @click="resetView">Reset</button>
+        <button
+          class="btn btn-ghost btn-sm"
+          @click="zoom(0.1)"
+        >
+          ＋ Zoom
+        </button>
+        <button
+          class="btn btn-ghost btn-sm"
+          @click="zoom(-0.1)"
+        >
+          － Zoom
+        </button>
+        <button
+          class="btn btn-ghost btn-sm"
+          @click="resetView"
+        >
+          Reset
+        </button>
       </div>
     </div>
 
     <!-- Person detail panel -->
     <div class="tree-layout">
-      <div class="tree-canvas-wrap" ref="canvasWrap">
-        <div class="tree-canvas" :style="canvasStyle" ref="canvas">
-          <svg :width="svgWidth" :height="svgHeight" class="tree-svg">
+      <div
+        ref="canvasWrap"
+        class="tree-canvas-wrap"
+      >
+        <div
+          ref="canvas"
+          class="tree-canvas"
+          :style="canvasStyle"
+        >
+          <svg
+            :width="svgWidth"
+            :height="svgHeight"
+            class="tree-svg"
+          >
             <!-- Connector lines -->
-            <line v-for="line in lines" :key="line.id"
-              :x1="line.x1" :y1="line.y1" :x2="line.x2" :y2="line.y2"
-              stroke="#7A6020" stroke-width="1" />
+            <line
+              v-for="line in lines"
+              :key="line.id"
+              :x1="line.x1"
+              :y1="line.y1"
+              :x2="line.x2"
+              :y2="line.y2"
+              stroke="#7A6020"
+              stroke-width="1"
+            />
           </svg>
 
           <!-- Person nodes -->
-          <div v-for="node in nodes" :key="node.id"
+          <div
+            v-for="node in nodes"
+            :key="node.id"
             class="person-node"
             :class="{ selected: selectedId === node.id, private: node.isPrivate }"
             :style="{ left: node.x + 'px', top: node.y + 'px' }"
-            @click="selectPerson(node)">
+            @click="selectPerson(node)"
+          >
             <div class="node-avatar">
-              <img v-if="node.thumbnailUrl" :src="node.thumbnailUrl" :alt="node.displayName" />
-              <span v-else class="avatar-initials">{{ initials(node.displayName) }}</span>
+              <img
+                v-if="node.thumbnailUrl"
+                :src="node.thumbnailUrl"
+                :alt="node.displayName"
+              >
+              <span
+                v-else
+                class="avatar-initials"
+              >{{ initials(node.displayName) }}</span>
             </div>
-            <div class="node-name">{{ node.displayName }}</div>
-            <div class="node-dates text-muted" v-if="!node.isPrivate || auth.isLoggedIn">
+            <div class="node-name">
+              {{ node.displayName }}
+            </div>
+            <div
+              v-if="!node.isPrivate || auth.isLoggedIn"
+              class="node-dates text-muted"
+            >
               {{ node.birthDate ? node.birthDate.substring(0,4) : '?' }}
               {{ node.deathDate ? '– ' + node.deathDate.substring(0,4) : '' }}
             </div>
@@ -47,31 +104,90 @@
 
       <!-- Side panel -->
       <Transition name="fade">
-        <div class="person-panel card" v-if="selected">
-          <button class="panel-close" @click="selected = null; selectedId = null">✕</button>
+        <div
+          v-if="selected"
+          class="person-panel card"
+        >
+          <button
+            class="panel-close"
+            @click="selected = null; selectedId = null"
+          >
+            ✕
+          </button>
           <div class="panel-avatar">
-            <img v-if="selected.thumbnailUrl" :src="selected.thumbnailUrl" />
-            <div v-else class="avatar-large">{{ initials(selected.firstName + ' ' + selected.lastName) }}</div>
+            <img
+              v-if="selected.thumbnailUrl"
+              :src="selected.thumbnailUrl"
+            >
+            <div
+              v-else
+              class="avatar-large"
+            >
+              {{ initials(selected.firstName + ' ' + selected.lastName) }}
+            </div>
           </div>
-          <h2 class="panel-name display-font">{{ selected.firstName }} {{ selected.lastName }}</h2>
-          <div class="panel-dates text-muted" v-if="selected.birthDate || selected.deathDate">
+          <h2 class="panel-name display-font">
+            {{ selected.firstName }} {{ selected.lastName }}
+          </h2>
+          <div
+            v-if="selected.birthDate || selected.deathDate"
+            class="panel-dates text-muted"
+          >
             {{ selected.birthDate || '?' }} {{ selected.deathDate ? '– ' + selected.deathDate : '' }}
           </div>
-          <div class="panel-place text-muted" v-if="selected.birthPlace">{{ selected.birthPlace }}</div>
-          <hr class="gold-rule" />
-          <p v-if="selected.bio" class="panel-bio text-muted">{{ selected.bio }}</p>
-          <div class="panel-parents" v-if="selected.fatherName || selected.motherName">
-            <div v-if="selected.fatherName" class="text-muted">Father: <span class="text-gold">{{ selected.fatherName }}</span></div>
-            <div v-if="selected.motherName" class="text-muted">Mother: <span class="text-gold">{{ selected.motherName }}</span></div>
+          <div
+            v-if="selected.birthPlace"
+            class="panel-place text-muted"
+          >
+            {{ selected.birthPlace }}
           </div>
-          <div class="panel-counts" v-if="selected.mediaCount || selected.docCount || selected.storyCount">
-            <RouterLink :to="`/photos?person=${selected.id}`" class="count-chip" v-if="selected.mediaCount">
+          <hr class="gold-rule">
+          <p
+            v-if="selected.bio"
+            class="panel-bio text-muted"
+          >
+            {{ selected.bio }}
+          </p>
+          <div
+            v-if="selected.fatherName || selected.motherName"
+            class="panel-parents"
+          >
+            <div
+              v-if="selected.fatherName"
+              class="text-muted"
+            >
+              Father: <span class="text-gold">{{ selected.fatherName }}</span>
+            </div>
+            <div
+              v-if="selected.motherName"
+              class="text-muted"
+            >
+              Mother: <span class="text-gold">{{ selected.motherName }}</span>
+            </div>
+          </div>
+          <div
+            v-if="selected.mediaCount || selected.docCount || selected.storyCount"
+            class="panel-counts"
+          >
+            <RouterLink
+              v-if="selected.mediaCount"
+              :to="`/photos?person=${selected.id}`"
+              class="count-chip"
+            >
               📷 {{ selected.mediaCount }} photos
             </RouterLink>
-            <RouterLink :to="`/documents?person=${selected.id}`" class="count-chip" v-if="selected.docCount">
+            <RouterLink
+              v-if="selected.docCount"
+              :to="`/documents?person=${selected.id}`"
+              class="count-chip"
+            >
               📄 {{ selected.docCount }} documents
             </RouterLink>
-            <RouterLink :to="`/stories?person=${selected.id}`" class="count-chip" v-if="selected.storyCount">
+            <RouterLink
+              v-if="selected.storyCount"
+              :to="`/stories?person=${selected.id}`"
+              class="count-chip"
+            >
               📖 {{ selected.storyCount }} stories
             </RouterLink>
           </div>

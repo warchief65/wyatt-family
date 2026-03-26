@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,9 +38,10 @@ public class CommentsController : ControllerBase
     public async Task<IActionResult> PostComment([FromBody] PostCommentRequest req)
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
         var comment = new Comment
         {
-            AuthorId     = userId!,
+            AuthorId     = userId,
             ArtifactType = req.ArtifactType,
             ArtifactId   = req.ArtifactId,
             Text         = req.Text
@@ -56,6 +58,7 @@ public class CommentsController : ControllerBase
         var comment = await _db.Comments.FindAsync(id);
         if (comment is null) return NotFound();
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
         if (comment.AuthorId != userId && !User.IsInRole("admin")) return Forbid();
         comment.Text      = req.Text;
         comment.UpdatedAt = DateTime.UtcNow;
@@ -70,6 +73,7 @@ public class CommentsController : ControllerBase
         var comment = await _db.Comments.FindAsync(id);
         if (comment is null) return NotFound();
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
         if (comment.AuthorId != userId && !User.IsInRole("admin")) return Forbid();
         _db.Comments.Remove(comment);
         await _db.SaveChangesAsync();
@@ -90,11 +94,12 @@ public class SubmissionsController : ControllerBase
     private readonly IBlobService   _blob;
     private readonly IEmailService  _email;
     private readonly IConfiguration _config;
+    private readonly ILogger<SubmissionsController> _logger;
 
     public SubmissionsController(AppDbContext db, IBlobService blob,
-        IEmailService email, IConfiguration config)
+        IEmailService email, IConfiguration config, ILogger<SubmissionsController> logger)
     {
-        _db = db; _blob = blob; _email = email; _config = config;
+        _db = db; _blob = blob; _email = email; _config = config; _logger = logger;
     }
 
     [HttpPost]
@@ -102,46 +107,79 @@ public class SubmissionsController : ControllerBase
     public async Task<IActionResult> Submit([FromForm] SubmissionFormRequest req)
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        var user   = await _db.Users.FindAsync(userId);
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+        var user = await _db.Users.FindAsync(userId);
 
-        var submission = new Submission
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        var uploadedKeys = new List<string>();
+        try
         {
-            SubmittedById = userId!,
-            ContentType   = req.ContentType,
-            Title         = req.Title,
-            Description   = req.Description,
-            DateDisplay   = req.Date,
-            Location      = req.Location,
-            People        = req.People,
-            Tags          = req.Tags,
-            Source        = req.Source,
-        };
-        _db.Submissions.Add(submission);
-        await _db.SaveChangesAsync();
-
-        // Upload files to staging container
-        if (req.Files is not null)
-        {
-            foreach (var file in req.Files)
+            var submission = new Submission
             {
-                var key = $"submissions/{submission.Id}/{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-                await using var stream = file.OpenReadStream();
-                await _blob.UploadAsync(key, stream, file.ContentType, isPrivate: true, container: "SubmissionContainer");
-                _db.SubmissionFiles.Add(new SubmissionFile {
-                    SubmissionId = submission.Id, StorageKey = key,
-                    FileName = file.FileName, ContentType = file.ContentType, FileSizeBytes = file.Length
-                });
-            }
+                SubmittedById = userId,
+                ContentType   = req.ContentType,
+                Title         = req.Title,
+                Description   = req.Description,
+                DateDisplay   = req.Date,
+                Location      = req.Location,
+                People        = req.People,
+                Tags          = req.Tags,
+                Source        = req.Source,
+            };
+            _db.Submissions.Add(submission);
             await _db.SaveChangesAsync();
+
+            // Upload files to staging container
+            if (req.Files is not null)
+            {
+                foreach (var file in req.Files)
+                {
+                    var key = $"submissions/{submission.Id}/{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                    await using var stream = file.OpenReadStream();
+                    await _blob.UploadAsync(key, stream, file.ContentType, isPrivate: true, container: "SubmissionContainer");
+                    uploadedKeys.Add(key);
+                    _db.SubmissionFiles.Add(new SubmissionFile {
+                        SubmissionId = submission.Id, StorageKey = key,
+                        FileName = file.FileName, ContentType = file.ContentType, FileSizeBytes = file.Length
+                    });
+                }
+                await _db.SaveChangesAsync();
+            }
+
+            await transaction.CommitAsync();
+
+            // Notify admin (non-blocking — failure here should not fail the submission)
+            try
+            {
+                var adminEmail = _config["Email:FromAddress"];
+                var frontendUrl = _config["Frontend:BaseUrl"];
+                if (!string.IsNullOrEmpty(adminEmail))
+                {
+                    var safeTitle = WebUtility.HtmlEncode(req.Title);
+                    var safeName  = WebUtility.HtmlEncode($"{user?.FirstName} {user?.LastName}");
+                    var safeType  = WebUtility.HtmlEncode(req.ContentType);
+                    await _email.SendAsync(adminEmail, $"New Submission: {req.Title}",
+                        $"<p>{safeName} submitted <strong>{safeTitle}</strong> ({safeType}).</p>" +
+                        $"<p><a href='{frontendUrl}/admin/submissions'>Review in Admin Panel</a></p>");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send admin notification email for submission {SubmissionId}", submission.Id);
+            }
+
+            return Ok(new { submission.Id });
         }
-
-        // Notify admin
-        var adminEmail = _config["Email:FromAddress"]!;
-        await _email.SendAsync(adminEmail, $"New Submission: {req.Title}",
-            $"<p>{user?.FirstName} {user?.LastName} submitted <strong>{req.Title}</strong> ({req.ContentType}).</p>" +
-            $"<p><a href='{_config["Frontend:BaseUrl"]}/admin/submissions'>Review in Admin Panel</a></p>");
-
-        return Ok(new { submission.Id });
+        catch
+        {
+            // Clean up any blobs that were already uploaded
+            foreach (var key in uploadedKeys)
+            {
+                try { await _blob.DeleteAsync(key, isPrivate: true); }
+                catch { /* best-effort cleanup */ }
+            }
+            throw;
+        }
     }
 
     // Member: view their own submissions
@@ -149,6 +187,7 @@ public class SubmissionsController : ControllerBase
     public async Task<IActionResult> MySubmissions()
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
         var subs = await _db.Submissions
             .Where(s => s.SubmittedById == userId)
             .OrderByDescending(s => s.SubmittedAt)

@@ -1,20 +1,60 @@
 <template>
   <div class="admin-layout">
     <aside class="admin-sidebar">
-      <div class="sidebar-brand display-font">Admin</div>
+      <div class="sidebar-brand display-font">
+        Admin
+      </div>
       <nav class="sidebar-nav">
-        <RouterLink to="/admin"             exact-active-class="active">Dashboard</RouterLink>
-        <RouterLink to="/admin/users"       active-class="active">Users</RouterLink>
-        <RouterLink to="/admin/submissions" active-class="active">
-          Submissions
-          <span v-if="pendingCount" class="nav-badge">{{ pendingCount }}</span>
+        <RouterLink
+          to="/admin"
+          exact-active-class="active"
+        >
+          Dashboard
         </RouterLink>
-        <RouterLink to="/admin/content"     active-class="active">Content</RouterLink>
-        <RouterLink to="/admin/comments"    active-class="active">Comments</RouterLink>
-        <RouterLink to="/admin/donations"   active-class="active">Donations</RouterLink>
-        <RouterLink to="/admin/bulk-upload" active-class="active">Bulk Upload</RouterLink>
-        <hr />
-        <RouterLink to="/">← View Site</RouterLink>
+        <RouterLink
+          to="/admin/users"
+          active-class="active"
+        >
+          Users
+        </RouterLink>
+        <RouterLink
+          to="/admin/submissions"
+          active-class="active"
+        >
+          Submissions
+          <span
+            v-if="pendingCount"
+            class="nav-badge"
+          >{{ pendingCount }}</span>
+        </RouterLink>
+        <RouterLink
+          to="/admin/content"
+          active-class="active"
+        >
+          Content
+        </RouterLink>
+        <RouterLink
+          to="/admin/comments"
+          active-class="active"
+        >
+          Comments
+        </RouterLink>
+        <RouterLink
+          to="/admin/donations"
+          active-class="active"
+        >
+          Donations
+        </RouterLink>
+        <RouterLink
+          to="/admin/bulk-upload"
+          active-class="active"
+        >
+          Bulk Upload
+        </RouterLink>
+        <hr>
+        <RouterLink to="/">
+          ← View Site
+        </RouterLink>
       </nav>
     </aside>
 
@@ -32,7 +72,7 @@ onMounted(async () => {
   try {
     const { data } = await api.get('/admin/stats')
     pendingCount.value = data.pendingSubmissions + data.pendingUsers
-  } catch {}
+  } catch { /* ignored */ }
 })
 </script>
 

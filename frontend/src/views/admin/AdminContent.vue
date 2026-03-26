@@ -1,18 +1,31 @@
 <template>
   <div class="admin-content">
-    <h1 class="display-font admin-title">Content</h1>
-    <hr class="gold-rule" />
+    <h1 class="display-font admin-title">
+      Content
+    </h1>
+    <hr class="gold-rule">
 
     <div class="toolbar">
       <div class="filter-tabs">
-        <button v-for="t in tabs" :key="t.value"
+        <button
+          v-for="t in tabs"
+          :key="t.value"
           :class="['btn btn-ghost btn-sm', filter === t.value && 'active']"
-          @click="filter = t.value; load()">
+          @click="filter = t.value; load()"
+        >
           {{ t.label }}
-          <span v-if="t.count" class="tab-count">{{ t.count }}</span>
+          <span
+            v-if="t.count"
+            class="tab-count"
+          >{{ t.count }}</span>
         </button>
       </div>
-      <input v-model="search" placeholder="Search content..." class="search-input" @input="load" />
+      <input
+        v-model="search"
+        placeholder="Search content..."
+        class="search-input"
+        @input="load"
+      >
     </div>
 
     <div class="content-table">
@@ -27,62 +40,134 @@
           </tr>
         </thead>
         <tbody>
-          <template v-for="c in items" :key="c.type + c.id">
+          <template
+            v-for="c in items"
+            :key="c.type + c.id"
+          >
             <tr :class="{ 'row-expandable': c.type === 'Photo Album', 'row-expanded': expandedAlbum?.id === c.id }">
               <td>
-                <button v-if="c.type === 'Photo Album'" class="expand-btn" @click="toggleAlbum(c)">
+                <button
+                  v-if="c.type === 'Photo Album'"
+                  class="expand-btn"
+                  @click="toggleAlbum(c)"
+                >
                   {{ expandedAlbum?.id === c.id ? '▾' : '▸' }}
                 </button>
-                <span v-if="c.type === 'Photo'" class="photo-inline">
-                  <img v-if="c.thumbnailUrl" :src="c.thumbnailUrl" class="inline-thumb" />
-                  <span v-else class="inline-thumb-placeholder">{{ c.mediaType === 'video' ? '▶' : '📷' }}</span>
+                <span
+                  v-if="c.type === 'Photo'"
+                  class="photo-inline"
+                >
+                  <img
+                    v-if="c.thumbnailUrl"
+                    :src="c.thumbnailUrl"
+                    class="inline-thumb"
+                  >
+                  <span
+                    v-else
+                    class="inline-thumb-placeholder"
+                  >{{ c.mediaType === 'video' ? '▶' : '📷' }}</span>
                 </span>
-                <span :class="{ 'album-link': c.type === 'Photo Album' }" @click="c.type === 'Photo Album' && toggleAlbum(c)">
+                <span
+                  :class="{ 'album-link': c.type === 'Photo Album' }"
+                  @click="c.type === 'Photo Album' && toggleAlbum(c)"
+                >
                   {{ c.title }}
                 </span>
-                <span v-if="c.type === 'Photo Album' && c.itemCount" class="item-count text-muted">({{ c.itemCount }} items)</span>
-                <span v-if="c.albumTitle" class="item-count text-muted">in {{ c.albumTitle }}</span>
+                <span
+                  v-if="c.type === 'Photo Album' && c.itemCount"
+                  class="item-count text-muted"
+                >({{ c.itemCount }} items)</span>
+                <span
+                  v-if="c.albumTitle"
+                  class="item-count text-muted"
+                >in {{ c.albumTitle }}</span>
               </td>
               <td><span class="badge">{{ c.type }}</span></td>
               <td>{{ c.isPrivate ? 'Yes' : 'No' }}</td>
-              <td class="text-muted">{{ formatDate(c.createdAt) }}</td>
+              <td class="text-muted">
+                {{ formatDate(c.createdAt) }}
+              </td>
               <td>
-                <button class="btn btn-danger btn-sm" @click="deleteItem(c)" :disabled="deleting">
+                <button
+                  class="btn btn-danger btn-sm"
+                  :disabled="deleting"
+                  @click="deleteItem(c)"
+                >
                   {{ deleting === c ? 'Deleting...' : 'Delete' }}
                 </button>
               </td>
             </tr>
             <!-- Expanded album items -->
-            <tr v-if="expandedAlbum?.id === c.id && albumItems.length" class="album-detail-row">
+            <tr
+              v-if="expandedAlbum?.id === c.id && albumItems.length"
+              class="album-detail-row"
+            >
               <td colspan="5">
                 <div class="album-items">
-                  <div v-if="loadingAlbum" class="text-muted loading-items">Loading items...</div>
-                  <div v-else class="items-grid">
-                    <div v-for="item in albumItems" :key="item.id" class="album-item card">
+                  <div
+                    v-if="loadingAlbum"
+                    class="text-muted loading-items"
+                  >
+                    Loading items...
+                  </div>
+                  <div
+                    v-else
+                    class="items-grid"
+                  >
+                    <div
+                      v-for="item in albumItems"
+                      :key="item.id"
+                      class="album-item card"
+                    >
                       <div class="item-thumb">
-                        <img v-if="item.thumbnailUrl" :src="item.thumbnailUrl" :alt="item.title" />
-                        <div v-else class="thumb-placeholder">
+                        <img
+                          v-if="item.thumbnailUrl"
+                          :src="item.thumbnailUrl"
+                          :alt="item.title"
+                        >
+                        <div
+                          v-else
+                          class="thumb-placeholder"
+                        >
                           <span v-if="item.type === 'video'">▶</span>
                           <span v-else>📷</span>
                         </div>
                       </div>
                       <div class="item-info">
-                        <div class="item-title">{{ item.title }}</div>
-                        <div class="item-meta text-muted">{{ item.type }}</div>
+                        <div class="item-title">
+                          {{ item.title }}
+                        </div>
+                        <div class="item-meta text-muted">
+                          {{ item.type }}
+                        </div>
                       </div>
-                      <button class="btn btn-danger btn-xs" @click="deleteMediaItem(c, item)" :disabled="deleting">
+                      <button
+                        class="btn btn-danger btn-xs"
+                        :disabled="deleting"
+                        @click="deleteMediaItem(c, item)"
+                      >
                         {{ deleting === item ? '...' : '✕' }}
                       </button>
                     </div>
                   </div>
-                  <div v-if="!loadingAlbum && !albumItems.length" class="text-muted empty-items">Album is empty.</div>
+                  <div
+                    v-if="!loadingAlbum && !albumItems.length"
+                    class="text-muted empty-items"
+                  >
+                    Album is empty.
+                  </div>
                 </div>
               </td>
             </tr>
           </template>
         </tbody>
       </table>
-      <div v-if="!items.length" class="empty text-muted">No content found.</div>
+      <div
+        v-if="!items.length"
+        class="empty text-muted"
+      >
+        No content found.
+      </div>
     </div>
   </div>
 </template>
@@ -218,7 +303,7 @@ async function load() {
     } else {
       items.value = all
     }
-  } catch {}
+  } catch { /* ignored */ }
 }
 
 onMounted(load)

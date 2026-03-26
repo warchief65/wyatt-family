@@ -1,49 +1,111 @@
 <template>
   <div class="auth-page">
     <div class="auth-card card">
-      <img src="/crest.png" alt="Wyatt Crest" class="auth-crest" />
-      <h2 class="display-font auth-title">Join the Family</h2>
-      <hr class="gold-rule" />
-      <p class="auth-sub text-muted">Request access to the Wyatt Family archive. Your account will be reviewed and approved by the administrator.</p>
+      <img
+        src="/crest.png"
+        alt="Wyatt Crest"
+        class="auth-crest"
+      >
+      <h2 class="display-font auth-title">
+        Join the Family
+      </h2>
+      <hr class="gold-rule">
+      <p class="auth-sub text-muted">
+        Request access to the Wyatt Family archive. Your account will be reviewed and approved by the administrator.
+      </p>
 
-      <form @submit.prevent="handleRegister" v-if="!submitted">
+      <form
+        v-if="!submitted"
+        @submit.prevent="handleRegister"
+      >
         <div class="form-group">
           <label>First Name</label>
-          <input v-model="form.firstName" type="text" required placeholder="Thomas" />
+          <input
+            v-model="form.firstName"
+            type="text"
+            required
+            placeholder="Thomas"
+          >
         </div>
         <div class="form-group">
           <label>Last Name</label>
-          <input v-model="form.lastName" type="text" required placeholder="Wyatt" />
+          <input
+            v-model="form.lastName"
+            type="text"
+            required
+            placeholder="Wyatt"
+          >
         </div>
         <div class="form-group">
           <label>Email Address</label>
-          <input v-model="form.email" type="email" required placeholder="you@example.com" />
+          <input
+            v-model="form.email"
+            type="email"
+            required
+            placeholder="you@example.com"
+          >
         </div>
         <div class="form-group">
           <label>Password</label>
-          <input v-model="form.password" type="password" required placeholder="Min. 8 characters" minlength="8" />
+          <input
+            v-model="form.password"
+            type="password"
+            required
+            placeholder="Min. 8 characters"
+            minlength="8"
+          >
         </div>
         <div class="form-group">
           <label>How are you related to the Wyatt family?</label>
-          <textarea v-model="form.relation" rows="3" placeholder="e.g. I am Robert Wyatt's granddaughter..." />
+          <textarea
+            v-model="form.relation"
+            rows="3"
+            placeholder="e.g. I am Robert Wyatt's granddaughter..."
+          />
         </div>
 
-        <p v-if="error" class="error-msg">{{ error }}</p>
+        <p
+          v-if="error"
+          class="error-msg"
+        >
+          {{ error }}
+        </p>
 
-        <button class="btn btn-primary full-width" type="submit" :disabled="loading">
+        <button
+          class="btn btn-primary full-width"
+          type="submit"
+          :disabled="loading"
+        >
           {{ loading ? 'Submitting...' : 'Request Access' }}
         </button>
       </form>
 
-      <div v-else class="success-msg">
-        <div class="success-icon">✓</div>
+      <div
+        v-else
+        class="success-msg"
+      >
+        <div class="success-icon">
+          ✓
+        </div>
         <h3>Request Submitted</h3>
-        <p class="text-muted">Thank you, {{ form.firstName }}. The administrator will review your request and you'll receive an email once approved.</p>
-        <RouterLink to="/" class="btn btn-secondary mt-2">Return Home</RouterLink>
+        <p class="text-muted">
+          Thank you, {{ form.firstName }}. The administrator will review your request and you'll receive an email once approved.
+        </p>
+        <RouterLink
+          to="/"
+          class="btn btn-secondary mt-2"
+        >
+          Return Home
+        </RouterLink>
       </div>
 
-      <div class="auth-links" v-if="!submitted">
-        <RouterLink to="/login">Already have an account? Sign in →</RouterLink>
+      <div
+        v-if="!submitted"
+        class="auth-links"
+      >
+        <RouterLink to="/login">
+          Already have an account? Sign in →
+        </RouterLink>
       </div>
     </div>
   </div>
