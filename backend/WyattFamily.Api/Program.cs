@@ -54,8 +54,8 @@ builder.Services.AddAuthorization();
 // ── Application Services ──────────────────────────────────────────
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
-if (builder.Environment.IsDevelopment() &&
-    builder.Configuration["Azure:BlobStorage:ConnectionString"] == "UseDevelopmentStorage=true")
+var azureBlobConn = builder.Configuration["Azure:BlobStorage:ConnectionString"];
+if (string.IsNullOrEmpty(azureBlobConn) || azureBlobConn == "UseDevelopmentStorage=true")
 {
     builder.Services.AddScoped<IBlobService, LocalFileBlobService>();
 }
