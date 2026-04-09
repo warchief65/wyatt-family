@@ -11,6 +11,7 @@ const routes = [
   { path: '/stories/:id', name: 'story',      component: () => import('@/views/StoryView.vue') },
   { path: '/donate',      name: 'donate',     component: () => import('@/views/DonateView.vue') },
   { path: '/thanks',      name: 'thanks',     component: () => import('@/views/ThanksView.vue') },
+  { path: '/theme-preview', name: 'theme-preview', component: () => import('@/views/ThemePreview.vue') },
 
   // Auth
   { path: '/login',    name: 'login',    component: () => import('@/views/auth/LoginView.vue') },
