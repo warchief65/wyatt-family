@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "backend\\WyattFamily.Api\\WyattFamily.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "frontend\\WyattFamily.Frontend.esproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

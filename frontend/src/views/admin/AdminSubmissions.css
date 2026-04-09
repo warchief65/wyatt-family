@@ -1,0 +1,30 @@
+.admin-title  { font-size: 36px; margin-bottom: 8px; }
+.toolbar      { margin-bottom: 1.25rem; }
+.filter-tabs  { display: flex; gap: 6px; }
+.btn-sm       { padding: 5px 12px; font-size: 11px; }
+.active       { border-color: var(--color-gold) !important; color: var(--color-gold) !important; }
+.tab-count    { background: var(--color-gold); color: #000; font-size: 9px; padding: 1px 5px; border-radius: 8px; margin-left: 4px; }
+
+.submissions-list { display: flex; flex-direction: column; gap: 14px; }
+.submission-card  { padding: 16px; }
+.sub-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
+.sub-type   { margin-left: 6px; }
+.sub-date   { font-size: 11px; }
+.sub-title  { font-size: 15px; margin-bottom: 4px; }
+.sub-author { font-size: 12px; margin-bottom: 6px; }
+.sub-desc   { font-size: 13px; line-height: 1.5; margin-bottom: 10px; }
+
+.sub-files  { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.sub-file   { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; }
+.file-thumb { width: 80px; height: 60px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--color-border); }
+.file-icon  { width: 80px; height: 60px; background: var(--color-bg-surface); display: flex; align-items: center; justify-content: center; font-size: 24px; border-radius: var(--radius-sm); }
+
+.sub-meta   { display: flex; gap: 16px; font-size: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.sub-actions { display: flex; gap: 8px; }
+.rejection-reason { font-size: 12px; font-style: italic; margin-top: 8px; }
+.empty { text-align: center; padding: 2rem; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.modal { max-width: 440px; width: 100%; padding: 1.75rem; }
+.modal h3 { margin-bottom: 8px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 1rem; }

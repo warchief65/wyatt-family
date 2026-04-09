@@ -1,0 +1,36 @@
+.page-header  { padding: 2rem 2rem 0; text-align: center; }
+.back-link    { display: inline-block; margin-bottom: 1rem; font-size: 13px; }
+.story-topic  { margin-bottom: 12px; }
+.story-title  { font-size: 44px; line-height: 1.1; margin-bottom: 10px; }
+.story-meta   { font-size: 13px; margin-bottom: 0; }
+
+.story-body {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--color-text-muted);
+}
+.story-body h2, .story-body h3 { color: var(--color-gold); margin: 1.5rem 0 0.75rem; }
+.story-body img { max-width: 100%; border-radius: var(--radius-md); margin: 1rem 0; }
+.story-body blockquote { border-left: 3px solid var(--color-gold-dark); padding-left: 1rem; color: var(--color-text-muted); font-style: italic; }
+
+.story-footer { max-width: 720px; margin: 0 auto; padding: 0 2rem 2rem; }
+.tagged-people { margin-top: 1.5rem; }
+.section-label { display: block; margin-bottom: 10px; }
+.people-chips  { display: flex; gap: 8px; flex-wrap: wrap; }
+.person-chip {
+  background: var(--color-gold-subtle);
+  color: var(--color-gold);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.person-chip:hover { background: var(--color-gold-deep); }
+
+.story-comments { max-width: 720px; margin: 0 auto; padding: 0 2rem 3rem; }
+.comment-gate { font-size: 13px; padding: 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); text-align: center; }
+.loading { text-align: center; padding: 4rem; }

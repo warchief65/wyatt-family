@@ -1,0 +1,16 @@
+.auth-page { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.auth-card { width: 100%; max-width: 400px; padding: 2.5rem; text-align: center; }
+.auth-crest { width: 60px; height: 60px; object-fit: contain; margin-bottom: 1rem; opacity: 0.85; }
+.auth-title { font-size: 32px; margin-bottom: 0; }
+.auth-sub   { font-size: 13px; margin-bottom: 1.5rem; line-height: 1.6; }
+.full-width { width: 100%; justify-content: center; padding: 10px; }
+.auth-links { margin-top: 1.25rem; font-size: 13px; }
+.auth-links a { color: var(--color-gold-dark); }
+.auth-links a:hover { color: var(--color-gold); }
+.error-msg  { color: #e05555; font-size: 13px; margin-bottom: 1rem; }
+.auth-card form { text-align: left; }
+
+.success-msg { text-align: center; padding: 1rem 0; }
+.success-icon { font-size: 40px; color: var(--color-gold); margin-bottom: 1rem; }
+.success-msg h3 { color: var(--color-gold); margin-bottom: 0.75rem; }
+.success-msg p  { font-size: 14px; line-height: 1.6; }

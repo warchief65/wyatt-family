@@ -1,5 +1,4 @@
 import axios from 'axios'
-import router from '@/router'
 
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL || ''}/api`,
@@ -21,7 +20,9 @@ api.interceptors.response.use(
   err => {
     if (err.response?.status === 401) {
       localStorage.removeItem('wf_token')
-      router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
+      // Navigate via window.location since we don't have router access here
+      const current = window.location.pathname + window.location.search
+      window.location.href = `/login?redirect=${encodeURIComponent(current)}`
     }
     return Promise.reject(err)
   }

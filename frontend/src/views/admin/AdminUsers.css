@@ -1,0 +1,17 @@
+.admin-title { font-size: 36px; margin-bottom: 8px; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; gap: 12px; flex-wrap: wrap; }
+.filter-tabs { display: flex; gap: 6px; }
+.btn-sm  { padding: 5px 12px; font-size: 11px; }
+.btn-xs  { padding: 3px 10px; font-size: 11px; }
+.active  { border-color: var(--color-gold) !important; color: var(--color-gold) !important; }
+.tab-count { background: var(--color-gold); color: #000; font-size: 9px; padding: 1px 5px; border-radius: 8px; margin-left: 4px; }
+.search-input { width: 200px; }
+
+.user-table { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { text-align: left; padding: 8px 12px; font-size: 10px; letter-spacing: 1px; color: var(--color-gold-dark); border-bottom: 1px solid var(--color-border-gold); }
+tbody tr { border-bottom: 1px solid var(--color-border); }
+tbody tr:hover { background: var(--color-bg-card); }
+tbody td { padding: 10px 12px; }
+.actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.empty { text-align: center; padding: 2rem; }

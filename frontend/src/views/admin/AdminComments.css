@@ -1,0 +1,12 @@
+.admin-title { font-size: 36px; margin-bottom: 8px; }
+
+.comments-list { display: flex; flex-direction: column; gap: 12px; margin-top: 1.25rem; }
+.comment-card { padding: 14px 16px; }
+.comment-header { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 6px; }
+.comment-author { font-weight: 600; font-size: 13px; }
+.comment-target { font-size: 11px; }
+.comment-date { font-size: 11px; margin-left: auto; }
+.comment-text { font-size: 13px; margin-bottom: 8px; }
+.comment-actions { display: flex; gap: 6px; }
+.btn-xs { padding: 3px 10px; font-size: 11px; }
+.empty { text-align: center; padding: 2rem; }

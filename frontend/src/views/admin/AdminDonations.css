@@ -1,0 +1,14 @@
+.admin-title { font-size: 36px; margin-bottom: 8px; }
+
+.stat-bar { display: flex; gap: 2rem; margin: 1.25rem 0; }
+.stat-item { display: flex; flex-direction: column; }
+.stat-value { font-size: 24px; font-weight: 700; }
+.stat-label { font-size: 11px; letter-spacing: 1px; }
+
+.donations-table { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { text-align: left; padding: 8px 12px; font-size: 10px; letter-spacing: 1px; color: var(--color-gold-dark); border-bottom: 1px solid var(--color-border-gold); }
+tbody tr { border-bottom: 1px solid var(--color-border); }
+tbody tr:hover { background: var(--color-bg-card); }
+tbody td { padding: 10px 12px; }
+.empty { text-align: center; padding: 2rem; }

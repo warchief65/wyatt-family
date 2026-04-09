@@ -7,13 +7,11 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    'plugin:vue/vue3-recommended',
   ],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
+    ecmaFeatures: { jsx: true },
   },
-  rules: {
-    'vue/multi-word-component-names': 'off',
-  },
+  rules: {},
 }

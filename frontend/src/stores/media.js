@@ -1,36 +1,33 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { create } from 'zustand'
 import api from '@/services/api'
 
-export const useMediaStore = defineStore('media', () => {
-  const albums  = ref([])
-  const current = ref(null)
-  const loading = ref(false)
+export const useMediaStore = create((set) => ({
+  albums: [],
+  current: null,
+  loading: false,
 
-  async function fetchAlbums(params = {}) {
-    loading.value = true
+  async fetchAlbums(params = {}) {
+    set({ loading: true })
     try {
       const { data } = await api.get('/media/albums', { params })
-      albums.value = data
+      set({ albums: data })
     } finally {
-      loading.value = false
+      set({ loading: false })
     }
-  }
+  },
 
-  async function fetchAlbum(id) {
-    loading.value = true
+  async fetchAlbum(id) {
+    set({ loading: true })
     try {
       const { data } = await api.get(`/media/albums/${id}`)
-      current.value = data
+      set({ current: data })
     } finally {
-      loading.value = false
+      set({ loading: false })
     }
-  }
+  },
 
-  async function fetchRecent(limit = 12) {
+  async fetchRecent(limit = 12) {
     const { data } = await api.get('/media/recent', { params: { limit } })
     return data
-  }
-
-  return { albums, current, loading, fetchAlbums, fetchAlbum, fetchRecent }
-})
+  },
+}))
